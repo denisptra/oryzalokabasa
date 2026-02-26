@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- ENUMS ---
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+// --- USER & AUTH ---
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  news      News[]
+  logs      Log[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// --- NEWS / WAWASAN (Berdasarkan Gambar 3 & 5) ---
+
+model News {
+  id              String        @id @default(uuid())
+  title           String
+  slug            String        @unique
+  content         String        @db.Text
+  thumbnail       String?
+  metaTitle       String?       @db.VarChar(70)
+  metaDescription String?       @db.VarChar(160)
+  status          ContentStatus @default(DRAFT)
+  views           Int           @default(0)
+  
+  // SEO & Filtering
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id])
+  tags            Tag[]         // Many-to-Many
+
+  authorId        String
+  author          User          @relation(fields: [authorId], references: [id])
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String @unique // Kolaborasi, Liputan, Pengumuman, Bahasa
+  slug  String @unique
+  news  News[]
+  galleries Gallery[]
+}
+
+model Tag {
+  id    String @id @default(uuid())
+  name  String @unique
+  slug  String @unique
+  news  News[]
+}
+
+model Gallery {
+  id          String   @id @default(uuid())
+  title       String
+  image       String   // URL Cloudinary/S3
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model HeroSlider {
+  id        String   @id @default(uuid())
+  title     String
+  subtitle  String?
+  image     String
+  link      String?  // Tombol "Jelajahi Kami"
+  isActive  Boolean  @default(true)
+}
+
+model ContactMessage {
+  id        String        @id @default(uuid())
+  name      String
+  email     String
+  topic     String        // Kolaborasi, Tiket, Pertanyaan Umum
+  message   String        @db.Text
+  status    MessageStatus @default(UNREAD)
+  ipAddress String?       // Untuk tracking security/spam
+  createdAt DateTime      @default(now())
+}
+
+// --- LOGGING SYSTEM (Super Complete) ---
+
+model Log {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  
+  action    String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  module    String   // NEWS, GALLERY, USER, SETTINGS
+  entityId  String?  // ID dari data yang diubah
+  details   Json?    // Menyimpan data lama (old value) dan baru (new value)
+  
+  userAgent String?  // Info browser admin
+  ipAddress String?
+  
+  createdAt DateTime @default(now())
+}
+
+// --- GLOBAL SETTINGS (Footer Info, Social Media) ---
+
+model Setting {
+  id        String @id @default(uuid())
+  key       String @unique // "phone", "email", "address", "facebook_url"
+  value     String @db.Text
+}
+
+//
