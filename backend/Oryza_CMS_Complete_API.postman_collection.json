@@ -1,0 +1,551 @@
+{
+  "info": {
+    "_postman_id": "oryza-cms-all-modules",
+    "name": "Oryza CMS - Complete API Testing Collection",
+    "description": "Complete Postman collection for testing Contact, Gallery, Hero Slider, and Settings modules",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Contact Messages",
+      "item": [
+        {
+          "name": "1. Send Contact Message (PUBLIC)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"topic\": \"Pertanyaan Umum\",\n  \"message\": \"Halo, saya ingin menanyakan tentang layanan Anda yang sangat menarik\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/contact/send",
+              "host": ["{{base_url}}"],
+              "path": ["contact", "send"]
+            },
+            "description": "Pengunjung submit form kontak (PUBLIC)"
+          }
+        },
+        {
+          "name": "2. Get All Messages (ADMIN+)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/contact/messages?page=1&limit=10&status=UNREAD",
+              "host": ["{{base_url}}"],
+              "path": ["contact", "messages"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "UNREAD" }
+              ]
+            },
+            "description": "Admin lihat semua pesan dengan filter status"
+          }
+        },
+        {
+          "name": "3. Get Message Statistics (ADMIN+)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/contact/stats",
+              "host": ["{{base_url}}"],
+              "path": ["contact", "stats"]
+            },
+            "description": "Admin lihat statistik pesan"
+          }
+        },
+        {
+          "name": "4. Get Message Detail (ADMIN+)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/contact/{{contact_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["contact", "{{contact_id}}"]
+            },
+            "description": "Admin lihat detail pesan (auto mark as READ)"
+          }
+        },
+        {
+          "name": "5. Mark as Read (ADMIN+)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/contact/mark-read/{{contact_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["contact", "mark-read", "{{contact_id}}"]
+            },
+            "description": "Admin tandai pesan sudah dibaca"
+          }
+        },
+        {
+          "name": "6. Archive Message (ADMIN+)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/contact/archive/{{contact_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["contact", "archive", "{{contact_id}}"]
+            },
+            "description": "Admin arsip pesan"
+          }
+        },
+        {
+          "name": "7. Delete Message (SUPER_ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{super_admin_token}}"
+              },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/contact/delete/{{contact_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["contact", "delete", "{{contact_id}}"]
+            },
+            "description": "Super admin hapus pesan (PERMANENT)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gallery",
+      "item": [
+        {
+          "name": "1. Upload Photo (ADMIN+)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Acara Turnamen 2024\",\n  \"image\": \"/uploads/tournament-photo.jpg\",\n  \"categoryId\": \"{{category_id}}\",\n  \"eventDate\": \"2024-02-25\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/gallery/upload",
+              "host": ["{{base_url}}"],
+              "path": ["gallery", "upload"]
+            },
+            "description": "Admin upload foto ke galeri"
+          }
+        },
+        {
+          "name": "2. Get All Gallery Photos (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/gallery?page=1&limit=12",
+              "host": ["{{base_url}}"],
+              "path": ["gallery"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "12" }
+              ]
+            },
+            "description": "Ambil semua foto galeri dengan pagination"
+          }
+        },
+        {
+          "name": "3. Get Gallery Statistics (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/gallery/stats",
+              "host": ["{{base_url}}"],
+              "path": ["gallery", "stats"]
+            },
+            "description": "Ambil statistik galeri (total, categories, recent)"
+          }
+        },
+        {
+          "name": "4. Get Photos by Category (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/gallery/category/{{category_id}}?page=1&limit=12",
+              "host": ["{{base_url}}"],
+              "path": ["gallery", "category", "{{category_id}}"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "12" }
+              ]
+            },
+            "description": "Filter foto berdasarkan kategori"
+          }
+        },
+        {
+          "name": "5. Get Photos by Event Date (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/gallery/event/2024-02?page=1&limit=12",
+              "host": ["{{base_url}}"],
+              "path": ["gallery", "event", "2024-02"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "12" }
+              ]
+            },
+            "description": "Filter foto berdasarkan tanggal event (YYYY-MM atau YYYY-MM-DD)"
+          }
+        },
+        {
+          "name": "6. Get Photo Detail (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/gallery/{{gallery_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["gallery", "{{gallery_id}}"]
+            },
+            "description": "Ambil detail foto"
+          }
+        },
+        {
+          "name": "7. Update Photo Info (ADMIN+)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Turnamen Final 2024\",\n  \"eventDate\": \"2024-02-25\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/gallery/update/{{gallery_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["gallery", "update", "{{gallery_id}}"]
+            },
+            "description": "Admin update informasi foto"
+          }
+        },
+        {
+          "name": "8. Delete Photo (ADMIN+)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/gallery/delete/{{gallery_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["gallery", "delete", "{{gallery_id}}"]
+            },
+            "description": "Admin hapus foto dari galeri"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hero Slider",
+      "item": [
+        {
+          "name": "1. Create Slider (ADMIN+)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Selamat Datang di Website Kami\",\n  \"subtitle\": \"Konten terbaik untuk Anda\",\n  \"image\": \"/uploads/hero-banner-1.jpg\",\n  \"link\": \"/posts\",\n  \"isActive\": true,\n  \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/hero-slider/create",
+              "host": ["{{base_url}}"],
+              "path": ["hero-slider", "create"]
+            },
+            "description": "Admin buat slider baru"
+          }
+        },
+        {
+          "name": "2. Get All Sliders (PUBLIC - Admin View)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/hero-slider",
+              "host": ["{{base_url}}"],
+              "path": ["hero-slider"]
+            },
+            "description": "Ambil semua slider termasuk yang inactive"
+          }
+        },
+        {
+          "name": "3. Get Active Sliders Only (PUBLIC - For Frontend)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/hero-slider/active",
+              "host": ["{{base_url}}"],
+              "path": ["hero-slider", "active"]
+            },
+            "description": "Ambil hanya slider yang aktif (untuk carousel frontend)"
+          }
+        },
+        {
+          "name": "4. Get Slider Detail (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/hero-slider/{{slider_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["hero-slider", "{{slider_id}}"]
+            },
+            "description": "Ambil detail slider"
+          }
+        },
+        {
+          "name": "5. Update Slider (ADMIN+)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Selamat Datang di Platform Kami\",\n  \"subtitle\": \"Konten eksklusif menanti Anda\",\n  \"image\": \"/uploads/hero-banner-updated.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/hero-slider/update/{{slider_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["hero-slider", "update", "{{slider_id}}"]
+            },
+            "description": "Admin update slider (partial update allowed)"
+          }
+        },
+        {
+          "name": "6. Toggle Slider Status (ADMIN+)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hero-slider/toggle/{{slider_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["hero-slider", "toggle", "{{slider_id}}"]
+            },
+            "description": "Admin toggle active/inactive status"
+          }
+        },
+        {
+          "name": "7. Reorder Sliders (ADMIN+)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\"id\": \"{{slider_id}}\", \"order\": 2},\n  {\"id\": \"slider_id_2\", \"order\": 1},\n  {\"id\": \"slider_id_3\", \"order\": 3}\n]"
+            },
+            "url": {
+              "raw": "{{base_url}}/hero-slider/reorder",
+              "host": ["{{base_url}}"],
+              "path": ["hero-slider", "reorder"]
+            },
+            "description": "Admin ubah urutan slider (batch)"
+          }
+        },
+        {
+          "name": "8. Delete Slider (ADMIN+)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hero-slider/delete/{{slider_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["hero-slider", "delete", "{{slider_id}}"]
+            },
+            "description": "Admin hapus slider"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "1. Save Setting (SUPER_ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{super_admin_token}}"
+              },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"blog_title\",\n  \"value\": \"Oryza Lokabasah - Blog Terpercaya\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/settings/save",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "save"]
+            },
+            "description": "Super admin buat/update setting (upsert)"
+          }
+        },
+        {
+          "name": "2. Get All Settings (SUPER_ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{super_admin_token}}"
+              },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/settings",
+              "host": ["{{base_url}}"],
+              "path": ["settings"]
+            },
+            "description": "Super admin lihat semua setting"
+          }
+        },
+        {
+          "name": "3. Get Single Setting (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/settings/key/blog_title",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "key", "blog_title"]
+            },
+            "description": "Ambil single setting by key (PUBLIC)"
+          }
+        },
+        {
+          "name": "4. Get Multiple Settings Batch (PUBLIC)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keys\": [\"blog_title\", \"blog_description\", \"contact_email\", \"social_facebook\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/settings/batch",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "batch"]
+            },
+            "description": "Ambil multiple settings sekaligus (PUBLIC)"
+          }
+        },
+        {
+          "name": "5. Get Settings Summary (PUBLIC - For Frontend)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/settings/summary",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "summary"]
+            },
+            "description": "Ambil frontend config snapshot dengan defaults (PUBLIC)"
+          }
+        },
+        {
+          "name": "6. Delete Setting (SUPER_ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{super_admin_token}}"
+              },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/settings/delete/blog_title",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "delete", "blog_title"]
+            },
+            "description": "Super admin delete specific setting"
+          }
+        },
+        {
+          "name": "7. Reset All Settings (SUPER_ADMIN - CAUTION!)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{super_admin_token}}"
+              },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/settings/reset",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "reset"]
+            },
+            "description": "PERMANENT: Super admin delete ALL settings!"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    { "key": "admin_token", "value": "", "type": "string" },
+    { "key": "super_admin_token", "value": "", "type": "string" },
+    { "key": "contact_id", "value": "", "type": "string" },
+    { "key": "category_id", "value": "", "type": "string" },
+    { "key": "gallery_id", "value": "", "type": "string" },
+    { "key": "slider_id", "value": "", "type": "string" }
+  ]
+}
