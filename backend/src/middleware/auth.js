@@ -1,53 +1,45 @@
 const jwt = require('jsonwebtoken');
 
-exports.protect = (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1];
+const authenticate = (req, res, next) => {
+    const authHeader = req.headers.authorization;
 
-    if (!token) return res.status(401).json({ message: "Sesi habis, silakan login ulang" });
+    // 1. Validasi keberadaan Header
+    if (!authHeader) {
+        return res.status(401).json({ 
+            status: 'error', 
+            message: 'Akses ditolak, header Authorization tidak ditemukan' 
+        });
+    }
+
+    // 2. Validasi format Bearer Token
+    const parts = authHeader.split(' ');
+    if (parts.length !== 2 || parts[0] !== 'Bearer') {
+        return res.status(401).json({
+            status: 'error',
+            message: 'Format token salah. Gunakan format: Bearer [token]'
+        });
+    }
+
+    const token = parts[1];
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // Isinya {id, role}
+        req.user = decoded; 
         next();
     } catch (error) {
-        return res.status(401).json({ message: "Token tidak valid" });
+        // 3. Pesan error spesifik berdasarkan jenis kesalahan JWT
+        let msg = 'Token tidak valid';
+        if (error.name === 'TokenExpiredError') {
+            msg = 'Token sudah kadaluarsa, silakan login kembali';
+        } else if (error.name === 'JsonWebTokenError') {
+            msg = 'Token cacat atau tidak dikenali';
+        }
+
+        return res.status(403).json({ 
+            status: 'error', 
+            message: msg 
+        });
     }
 };
 
-exports.authorize = (...roles) => {
-    return (req, res, next) => {
-        if (!roles.includes(req.user.role)) {
-            return res.status(403).json({ message: "Anda tidak punya akses ke fitur ini" });
-        }
-        next();
-    };
-};
-
-exports.authenticateToken = (req, res, next) => {
-  // 1. Ambil token dari header 'Authorization'
-  // Formatnya biasanya: Bearer <token>
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ 
-      success: false, 
-      message: "Akses ditolak, token tidak ditemukan" 
-    });
-  }
-
-  try {
-    // 2. Verifikasi token menggunakan Secret Key di .env
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // 3. Simpan data user yang login ke dalam object 'req' agar bisa dipakai di controller
-    req.user = verified; 
-    
-    next(); // Lanjut ke fungsi berikutnya (controller)
-  } catch (error) {
-    res.status(403).json({ 
-      success: false, 
-      message: "Token tidak valid atau sudah kedaluwarsa" 
-    });
-  }
-};
+module.exports = { authenticate };

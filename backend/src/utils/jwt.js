@@ -1,17 +1,16 @@
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-exports.generateAccessToken = (user) => {
-    return jwt.sign(
-        { id: user.id, role: user.role }, 
-        process.env.JWT_SECRET, 
-        { expiresIn: '15m' }
-    );
+const hashPassword = async (password) => {
+    return await bcrypt.hash(password, 10);
 };
 
-exports.generateRefreshToken = (user) => {
-    return jwt.sign(
-        { id: user.id }, 
-        process.env.JWT_REFRESH_SECRET, 
-        { expiresIn: '7d' }
-    );
+const comparePassword = async (password, hashed) => {
+    return await bcrypt.compare(password, hashed);
 };
+
+const generateToken = (payload) => {
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
+};
+
+module.exports = { hashPassword, comparePassword, generateToken };

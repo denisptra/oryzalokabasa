@@ -1,14 +1,22 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/auth.controller");
-const { protect } = require("../middleware/auth");
+const { validateRegister, validateLogin } = require("../middleware/validation");
+const { loginLimiter } = require("../middleware/rateLimiter");
+const { authenticate } = require("../middleware/auth");
 
-// URL: /api/v1/manage-oryza/auth/register
-router.post("/auth/register", authController.register);
+/**
+ * AUTH ROUTES
+ * - REGISTER: Untuk sign up user baru
+ * - LOGIN: Untuk sign in dengan email dan password
+ * - LOGOUT: Untuk sign out (logout)
+ */
 
-// URL: /api/v1/manage-oryza/auth/login
-router.post("/auth/login", authController.login);
+// Public routes (Tidak perlu token)
+router.post("/auth/register", validateRegister, authController.register);
+router.post("/auth/login", loginLimiter, validateLogin, authController.login);
 
-router.post("/auth/logout", protect, authController.logout);
+// Protected routes (Perlu token untuk akses)
+router.post("/auth/logout", authenticate, authController.logout);
 
 module.exports = router;
