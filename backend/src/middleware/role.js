@@ -4,11 +4,12 @@
  *
  * Contoh penggunaan:
  * - authorize('SUPER_ADMIN') => Hanya SUPER_ADMIN yang bisa akses
+ * - authorize('SUPER_ADMIN', 'ADMIN') => SUPER_ADMIN atau ADMIN bisa akses
  * - authorize(['SUPER_ADMIN', 'ADMIN']) => SUPER_ADMIN atau ADMIN bisa akses
  * - authorize({ action: 'delete_user', roles: 'SUPER_ADMIN' }) => Hanya SUPER_ADMIN bisa delete user
  */
 
-const authorize = (config = {}) => {
+const authorize = (...args) => {
   return (req, res, next) => {
     // req.user harus sudah set oleh middleware authenticate
     if (!req.user) {
@@ -18,9 +19,23 @@ const authorize = (config = {}) => {
       });
     }
 
+    // Jika dipanggil dengan multiple string: authorize("ADMIN", "SUPER_ADMIN")
+    if (args.length > 1 && args.every((a) => typeof a === "string")) {
+      if (!args.includes(req.user.role)) {
+        return res.status(403).json({
+          status: "error",
+          message: `Akses ditolak. Role '${req.user.role}' tidak memiliki izin mengakses resource ini.`,
+        });
+      }
+      return next();
+    }
+
+    const config = args[0] || {};
+
     // Jika config adalah string atau array (mode simple)
     if (typeof config === "string" || Array.isArray(config)) {
-      const allowedRoles = typeof config === "string" ? [config] : config;
+      const allowedRoles =
+        typeof config === "string" ? [config] : config;
 
       if (!allowedRoles.includes(req.user.role)) {
         return res.status(403).json({

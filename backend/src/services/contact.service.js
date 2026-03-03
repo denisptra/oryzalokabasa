@@ -39,20 +39,22 @@ class ContactService {
   }
 
   // GET ALL MESSAGES - Ambil semua pesan dengan pagination
-  async getAllMessages(page = 1, limit = 10, status = "UNREAD") {
+  async getAllMessages(page = 1, limit = 50, status = null) {
     const pageNum = parseInt(page) || 1;
-    const limitNum = parseInt(limit) || 10;
+    const limitNum = parseInt(limit) || 50;
 
-    // Validasi status
+    // Build where filter
+    const where = {};
     const validStatuses = ["UNREAD", "READ", "ARCHIVED"];
-    const filterStatus = validStatuses.includes(status) ? status : "UNREAD";
+    if (status && validStatuses.includes(status)) {
+      where.status = status;
+    }
+    // If no valid status filter, return all messages
 
     const skip = (pageNum - 1) * limitNum;
 
     const messages = await prisma.contactMessage.findMany({
-      where: {
-        status: filterStatus,
-      },
+      where,
       skip,
       take: limitNum,
       orderBy: {
@@ -60,11 +62,7 @@ class ContactService {
       },
     });
 
-    const total = await prisma.contactMessage.count({
-      where: {
-        status: filterStatus,
-      },
-    });
+    const total = await prisma.contactMessage.count({ where });
 
     const pages = Math.ceil(total / limitNum);
 

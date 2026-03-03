@@ -1,5 +1,7 @@
 const heroSliderService = require("../services/hero-slider.service");
 const { recordLog } = require("../utils/logger");
+const path = require("path");
+const fs = require("fs");
 
 /**
  * HERO SLIDER CONTROLLER
@@ -13,7 +15,28 @@ const { recordLog } = require("../utils/logger");
  */
 exports.createSlider = async (req, res) => {
   try {
-    const slider = await heroSliderService.createSlider(req.body);
+    let imagePath = "";
+    if (req.file) {
+      imagePath = `/uploads/hero-slider/${req.file.filename}`;
+    } else if (req.body.image) {
+      imagePath = req.body.image;
+    } else {
+      return res.status(400).json({
+        status: "error",
+        message: "File gambar harus diupload",
+      });
+    }
+
+    const data = {
+      title: req.body.title,
+      subtitle: req.body.subtitle || null,
+      image: imagePath,
+      link: req.body.link || null,
+      isActive: req.body.isActive === "true" || req.body.isActive === true,
+      order: parseInt(req.body.order) || 0,
+    };
+
+    const slider = await heroSliderService.createSlider(data);
 
     await recordLog(req, {
       action: "CREATE",
@@ -28,6 +51,10 @@ exports.createSlider = async (req, res) => {
       data: slider,
     });
   } catch (error) {
+    if (req.file) {
+      const filePath = path.join(__dirname, "../../uploads/hero-slider", req.file.filename);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
     res.status(400).json({
       status: "error",
       message: error.message,
@@ -105,10 +132,30 @@ exports.getSliderById = async (req, res) => {
  */
 exports.updateSlider = async (req, res) => {
   try {
-    const slider = await heroSliderService.updateSlider(
-      req.params.id,
-      req.body,
-    );
+    const updateData = { ...req.body };
+
+    // Handle file upload
+    if (req.file) {
+      updateData.image = `/uploads/hero-slider/${req.file.filename}`;
+      // Delete old image
+      try {
+        const old = await heroSliderService.getSliderById(req.params.id);
+        if (old.image && old.image.startsWith("/uploads/")) {
+          const oldPath = path.join(__dirname, "../..", old.image);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
+      } catch (e) { console.log("Could not delete old image:", e.message); }
+    }
+
+    // Parse boolean/int from form data
+    if (updateData.isActive !== undefined) {
+      updateData.isActive = updateData.isActive === "true" || updateData.isActive === true;
+    }
+    if (updateData.order !== undefined) {
+      updateData.order = parseInt(updateData.order) || 0;
+    }
+
+    const slider = await heroSliderService.updateSlider(req.params.id, updateData);
 
     await recordLog(req, {
       action: "UPDATE",
@@ -196,6 +243,12 @@ exports.deleteSlider = async (req, res) => {
   try {
     const sliderId = req.params.id;
     const slider = await heroSliderService.getSliderById(sliderId);
+
+    // Delete image file if local
+    if (slider.image && slider.image.startsWith("/uploads/")) {
+      const filePath = path.join(__dirname, "../..", slider.image);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
 
     await heroSliderService.deleteSlider(sliderId);
 

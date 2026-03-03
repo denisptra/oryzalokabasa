@@ -13,16 +13,13 @@ const { authorize } = require("../middleware/role.js");
  * GET /api/logs/user/:userId - Lihat semua log dari user tertentu
  */
 
-// Semua routes di bawah memerlukan authentication dan SUPER_ADMIN role
-router.use(authenticate, authorize("SUPER_ADMIN"));
-
 // Get all logs dengan pagination dan filter
-router.get("/logs", logController.getAllLogs);
+router.get("/logs", authenticate, authorize("SUPER_ADMIN"), logController.getAllLogs);
 
 // Get log by ID
-router.get("/log/:id", logController.getLogById);
+router.get("/log/:id", authenticate, authorize("SUPER_ADMIN"), logController.getLogById);
 
 // Get logs by user
-router.get("/logs/user/:userId", logController.getLogsByUser);
+router.get("/logs/user/:userId", authenticate, authorize("SUPER_ADMIN"), logController.getLogsByUser);
 
 module.exports = router;

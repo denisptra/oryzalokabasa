@@ -3,58 +3,63 @@ const router = express.Router();
 const heroSliderController = require("../controllers/hero-slider.controller");
 const { authenticate } = require("../middleware/auth");
 const { authorize } = require("../middleware/role");
+const { uploadHeroSlider, setUploadType } = require("../middleware/upload");
 
 // PUBLIC ENDPOINTS
 
 // GET /api/hero-slider - Ambil semua slider (admin view, include inactive)
-router.get("/", heroSliderController.getAllSliders);
+router.get("/hero-slider", heroSliderController.getAllSliders);
 
 // GET /api/hero-slider/active - Ambil slider aktif saja (untuk website frontend)
-router.get("/active", heroSliderController.getActiveSliders);
+router.get("/hero-slider/active", heroSliderController.getActiveSliders);
 
 // GET /api/hero-slider/:id - Ambil detail slider
-router.get("/:id", heroSliderController.getSliderById);
+router.get("/hero-slider/:id", heroSliderController.getSliderById);
 
 // PROTECTED ENDPOINTS (ADMIN+)
 
-// POST /api/hero-slider/create - Buat slider baru
+// POST /api/hero-slider/create - Buat slider baru (file upload)
 router.post(
-  "/create",
+  "/hero-slider/create",
   authenticate,
   authorize("ADMIN", "SUPER_ADMIN"),
-  heroSliderController.createSlider,
+  setUploadType("hero-slider"),
+  uploadHeroSlider.single("image"),
+  heroSliderController.createSlider
 );
 
-// PUT /api/hero-slider/update/:id - Edit slider
+// PUT /api/hero-slider/update/:id - Edit slider (optional new file)
 router.put(
-  "/update/:id",
+  "/hero-slider/update/:id",
   authenticate,
   authorize("ADMIN", "SUPER_ADMIN"),
-  heroSliderController.updateSlider,
+  setUploadType("hero-slider"),
+  uploadHeroSlider.single("image"),
+  heroSliderController.updateSlider
 );
 
 // PUT /api/hero-slider/toggle/:id - Aktifkan/nonaktifkan slider
 router.put(
-  "/toggle/:id",
+  "/hero-slider/toggle/:id",
   authenticate,
   authorize("ADMIN", "SUPER_ADMIN"),
-  heroSliderController.toggleSliderStatus,
+  heroSliderController.toggleSliderStatus
 );
 
 // PUT /api/hero-slider/reorder - Ubah urutan slider
 router.put(
-  "/reorder",
+  "/hero-slider/reorder",
   authenticate,
   authorize("ADMIN", "SUPER_ADMIN"),
-  heroSliderController.reorderSliders,
+  heroSliderController.reorderSliders
 );
 
 // DELETE /api/hero-slider/delete/:id - Hapus slider
 router.delete(
-  "/delete/:id",
+  "/hero-slider/delete/:id",
   authenticate,
   authorize("ADMIN", "SUPER_ADMIN"),
-  heroSliderController.deleteSlider,
+  heroSliderController.deleteSlider
 );
 
 module.exports = router;

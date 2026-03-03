@@ -3,48 +3,59 @@ const router = express.Router();
 const galleryController = require("../controllers/gallery.controller");
 const { authenticate } = require("../middleware/auth");
 const { authorize } = require("../middleware/role");
+const { uploadGallery, setUploadType } = require("../middleware/upload");
 
 // PUBLIC ENDPOINTS
 
-// GET /api/gallery - Ambil semua foto
-router.get("/", galleryController.getAllGallery);
+// GET /api/galleris - Ambil semua foto
+router.get("/galleris", galleryController.getAllGallery);
 
 // GET /api/gallery/stats - Statistik galeri
-router.get("/stats", galleryController.getGalleryStats);
+router.get("/gallery/stats", galleryController.getGalleryStats);
 
 // GET /api/gallery/category/:categoryId - Ambil foto by kategori
-router.get("/category/:categoryId", galleryController.getGalleryByCategory);
+router.get(
+  "/gallery/category/:categoryId",
+  galleryController.getGalleryByCategory
+);
 
 // GET /api/gallery/event/:eventDate - Ambil foto by event date
-router.get("/event/:eventDate", galleryController.getGalleryByEventDate);
+router.get(
+  "/gallery/event/:eventDate",
+  galleryController.getGalleryByEventDate
+);
 
 // GET /api/gallery/:id - Ambil detail foto
-router.get("/:id", galleryController.getGalleryById);
+router.get("/gallery/:id", galleryController.getGalleryById);
 
 // PROTECTED ENDPOINTS (ADMIN+)
 
-// POST /api/gallery/upload - Admin upload foto
+// POST /api/gallery/upload - Admin upload foto (file upload)
 router.post(
-  "/upload",
+  "/gallery/upload",
   authenticate,
   authorize("ADMIN", "SUPER_ADMIN"),
-  galleryController.uploadImage,
+  setUploadType("gallery"),
+  uploadGallery.single("image"),
+  galleryController.uploadImage
 );
 
-// PUT /api/gallery/update/:id - Admin edit foto info
+// PUT /api/gallery/update/:id - Admin update foto
 router.put(
-  "/update/:id",
+  "/gallery/update/:id",
   authenticate,
   authorize("ADMIN", "SUPER_ADMIN"),
-  galleryController.updateGallery,
+  setUploadType("gallery"),
+  uploadGallery.single("image"),
+  galleryController.updateGallery
 );
 
 // DELETE /api/gallery/delete/:id - Admin hapus foto
 router.delete(
-  "/delete/:id",
+  "/gallery/delete/:id",
   authenticate,
   authorize("ADMIN", "SUPER_ADMIN"),
-  galleryController.deleteGallery,
+  galleryController.deleteGallery
 );
 
 module.exports = router;

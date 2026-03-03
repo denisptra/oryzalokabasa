@@ -7,19 +7,19 @@ const { authorize } = require("../middleware/role");
 // PUBLIC ENDPOINTS
 
 // GET /api/settings/key/:key - Ambil setting by key
-router.get("/key/:key", settingsController.getSettingByKey);
+router.get("/setting/key/:key", settingsController.getSettingByKey);
 
 // POST /api/settings/batch - Ambil multiple settings
-router.post("/batch", settingsController.getMultipleSettings);
+router.post("/setting/batch", settingsController.getMultipleSettings);
 
 // GET /api/settings/summary - Ringkasan setting untuk frontend
-router.get("/summary", settingsController.getSettingsSummary);
+router.get("/setting/summary", settingsController.getSettingsSummary);
 
 // PROTECTED ENDPOINTS (SUPER_ADMIN only)
 
 // GET /api/settings - Ambil semua setting
 router.get(
-  "/",
+  "/setting/",
   authenticate,
   authorize("SUPER_ADMIN"),
   settingsController.getAllSettings,
@@ -27,7 +27,7 @@ router.get(
 
 // POST /api/settings/save - Buat/update setting
 router.post(
-  "/save",
+  "/setting/save",
   authenticate,
   authorize("SUPER_ADMIN"),
   settingsController.saveSetting,
@@ -35,7 +35,7 @@ router.post(
 
 // DELETE /api/settings/delete/:key - Hapus setting
 router.delete(
-  "/delete/:key",
+  "/setting/delete/:key",
   authenticate,
   authorize("SUPER_ADMIN"),
   settingsController.deleteSetting,
@@ -43,7 +43,7 @@ router.delete(
 
 // DELETE /api/settings/reset - Reset semua setting (CAUTION!)
 router.delete(
-  "/reset",
+  "/setting/reset",
   authenticate,
   authorize("SUPER_ADMIN"),
   settingsController.resetAllSettings,

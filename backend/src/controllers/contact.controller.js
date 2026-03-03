@@ -42,8 +42,8 @@ exports.createMessage = async (req, res) => {
  */
 exports.getAllMessages = async (req, res) => {
   try {
-    const { page = 1, limit = 10, status = "UNREAD" } = req.query;
-    const messages = await contactService.getAllMessages(page, limit, status);
+    const { page = 1, limit = 50, status } = req.query;
+    const messages = await contactService.getAllMessages(page, limit, status || null);
 
     res.status(200).json({
       status: "success",

@@ -1,7 +1,7 @@
 const rateLimit = require('express-rate-limit');
 
 const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // Periode waktu: 15 menit
+    windowMs: 1 * 60 * 1000, // Periode waktu: 15 menit
     max: 5, // Maksimal 5 kali percobaan per IP
     message: {
         status: 'error',

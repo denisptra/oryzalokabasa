@@ -20,23 +20,25 @@ router.get("/category/:id", categoryController.getCategoryById);
 
 // --- PROTECTED ROUTES (Perlu token) ---
 // Semua routes di bawah ini memerlukan authentication
-router.use(authenticate);
 
 // --- ADMIN & SUPER_ADMIN ONLY ---
 router.post(
   "/category/create",
+  authenticate,
   authorize(["ADMIN", "SUPER_ADMIN"]),
   categoryController.addCategory,
 );
 
 router.put(
   "/category/update/:id",
+  authenticate,
   authorize(["ADMIN", "SUPER_ADMIN"]),
   categoryController.updateCategory,
 );
 
 router.delete(
   "/category/delete/:id",
+  authenticate,
   authorize(["ADMIN", "SUPER_ADMIN"]),
   categoryController.deleteCategory,
 );

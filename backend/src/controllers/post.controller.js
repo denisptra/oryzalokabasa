@@ -1,5 +1,7 @@
 const postService = require("../services/post.service");
 const { recordLog } = require("../utils/logger");
+const path = require("path");
+const fs = require("fs");
 
 /**
  * CREATE POST - Buat postingan baru
@@ -8,9 +10,15 @@ const { recordLog } = require("../utils/logger");
  */
 exports.createPost = async (req, res) => {
   try {
-    const post = await postService.createPost(req.body, req.user.id);
+    const data = { ...req.body };
 
-    // Catat aktivitas membuat post
+    // Handle thumbnail file upload
+    if (req.file) {
+      data.thumbnail = `/uploads/posts/${req.file.filename}`;
+    }
+
+    const post = await postService.createPost(data, req.user.id);
+
     await recordLog(req, {
       action: "CREATE",
       module: "POST",
@@ -24,6 +32,10 @@ exports.createPost = async (req, res) => {
       data: post,
     });
   } catch (error) {
+    if (req.file) {
+      const filePath = path.join(__dirname, "../../uploads/posts", req.file.filename);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
     res.status(400).json({
       status: "error",
       message: error.message,
@@ -38,8 +50,8 @@ exports.createPost = async (req, res) => {
  */
 exports.getAllPosts = async (req, res) => {
   try {
-    const { page = 1, limit = 10, status = "PUBLISHED" } = req.query;
-    const posts = await postService.getAllPosts(page, limit, status);
+    const { page = 1, limit = 10, status = "PUBLISHED", categoryId, search } = req.query;
+    const posts = await postService.getAllPosts(page, limit, status, categoryId, search);
 
     res.status(200).json({
       status: "success",
@@ -109,9 +121,23 @@ exports.getPostBySlug = async (req, res) => {
  */
 exports.updatePost = async (req, res) => {
   try {
-    const post = await postService.updatePost(req.params.id, req.body);
+    const updateData = { ...req.body };
 
-    // Catat aktivitas mengubah post
+    // Handle thumbnail file upload
+    if (req.file) {
+      updateData.thumbnail = `/uploads/posts/${req.file.filename}`;
+      // Delete old thumbnail
+      try {
+        const old = await postService.getPostById(req.params.id);
+        if (old.thumbnail && old.thumbnail.startsWith("/uploads/")) {
+          const oldPath = path.join(__dirname, "../..", old.thumbnail);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
+      } catch (e) { console.log("Could not delete old thumbnail:", e.message); }
+    }
+
+    const post = await postService.updatePost(req.params.id, updateData);
+
     await recordLog(req, {
       action: "UPDATE",
       module: "POST",
@@ -142,9 +168,14 @@ exports.deletePost = async (req, res) => {
     const postId = req.params.id;
     const post = await postService.getPostById(postId);
 
+    // Delete thumbnail file if local
+    if (post.thumbnail && post.thumbnail.startsWith("/uploads/")) {
+      const filePath = path.join(__dirname, "../..", post.thumbnail);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+
     await postService.deletePost(postId);
 
-    // Catat aktivitas menghapus post
     await recordLog(req, {
       action: "DELETE",
       module: "POST",

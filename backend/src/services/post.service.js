@@ -28,9 +28,9 @@ const createPost = async (postData, authorId) => {
   // Format tags: comma-separated string
   const tags = postData.tags
     ? postData.tags
-        .split(",")
-        .map((t) => t.trim())
-        .join(", ")
+      .split(",")
+      .map((t) => t.trim())
+      .join(", ")
     : null;
 
   return await prisma.post.create({
@@ -56,12 +56,29 @@ const createPost = async (postData, authorId) => {
 /**
  * GET ALL - Ambil semua post dengan pagination & filter
  */
-const getAllPosts = async (page = 1, limit = 10, status = "PUBLISHED") => {
+const getAllPosts = async (page = 1, limit = 10, status = "PUBLISHED", categoryId = null, search = null) => {
   const skip = (page - 1) * limit;
 
   const where = {};
-  if (status) {
+  if (status && status !== "all") {
     where.status = status;
+  }
+
+  if (categoryId) {
+    const categories = Array.isArray(categoryId)
+      ? categoryId
+      : categoryId.split(",").map(c => c.trim()).filter(Boolean);
+    if (categories.length > 0) {
+      where.categoryId = { in: categories };
+    }
+  }
+
+  if (search) {
+    where.OR = [
+      { title: { contains: search, mode: "insensitive" } },
+      { content: { contains: search, mode: "insensitive" } },
+      { tags: { contains: search, mode: "insensitive" } },
+    ];
   }
 
   const posts = await prisma.post.findMany({
