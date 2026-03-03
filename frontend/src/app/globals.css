@@ -1,0 +1,129 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap");
+@import "tailwindcss";
+
+@theme {
+    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    --font-serif: var(--font-playfair-display), ui-serif, Georgia, serif;
+}
+
+@plugin "@tailwindcss/typography";
+
+/* --- Fix Bug Tulisan Nyamping (Word Break & Layout) --- */
+.ql-editor {
+    /* Mencegah teks meluber ke samping layar */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    /* Menjaga baris baru (Enter) tetap berfungsi */
+    white-space: pre-wrap; 
+    /* Padding standar editor */
+    padding: 0 !important; 
+}
+
+.ql-editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    margin: 1.5rem auto;
+    display: block;
+}
+
+/* --- Quill Alignment Classes --- */
+.ql-align-center { text-align: center; }
+.ql-align-right { text-align: right; }
+.ql-align-justify { text-align: justify; }
+
+/* --- Quill Text Sizes --- */
+.ql-size-small { font-size: 0.85em; }
+.ql-size-large { font-size: 1.25em; }
+.ql-size-huge { font-size: 1.75em; }
+
+/* --- Quill Elements Styling --- */
+.ql-editor {
+    h1, h2, h3, h4 {
+        font-family: var(--font-playfair-display), serif;
+        color: #0f172a; /* slate-900 */
+        line-height: 1.2;
+    }
+
+    h1 { font-size: 2.25rem !important; font-weight: 700 !important; margin-top: 2rem !important; margin-bottom: 1rem !important; }
+    h2 { font-size: 1.875rem !important; font-weight: 700 !important; margin-top: 1.75rem !important; margin-bottom: 0.75rem !important; }
+    h3 { font-size: 1.5rem !important; font-weight: 700 !important; margin-top: 1.5rem !important; margin-bottom: 0.5rem !important; }
+
+    p {
+        margin-bottom: 1.25rem !important;
+        line-height: 1.8 !important;
+        color: #334155; /* slate-700 */
+    }
+
+    a {
+        color: #1e40af !important; /* blue-800 */
+        text-decoration: underline !important;
+        text-underline-offset: 4px;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+
+    a:hover {
+        color: #fbbf24 !important; /* amber-400 */
+    }
+
+    /* Fix Bullets & Numbers (Native Styles) */
+    ul, ol {
+        padding-left: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+        color: #334155;
+    }
+
+    ul { list-style-type: disc !important; }
+    ol { list-style-type: decimal !important; }
+
+    li {
+        margin-bottom: 0.5rem !important;
+        padding-left: 0.5rem !important;
+    }
+
+    /* Menghapus gaya pseudo-element bawaan Quill yang sering membuat bullet double */
+    li::before {
+        display: none !important;
+    }
+
+    /* Blockquote / Kutipan */
+    blockquote {
+        border-left: 4px solid #eab308 !important; /* yellow-500 */
+        padding: 1rem 1.5rem !important;
+        background-color: #f8fafc; /* slate-50 */
+        color: #475569 !important; /* slate-600 */
+        font-style: italic !important;
+        font-size: 1.1rem;
+        margin: 2rem 0 !important;
+        border-radius: 0 0.75rem 0.75rem 0;
+    }
+
+    /* Code Block Sederhana */
+    pre {
+        background-color: #1e293b !important; /* slate-800 */
+        color: #f1f5f9 !important;
+        padding: 1rem !important;
+        border-radius: 0.75rem !important;
+        overflow-x: auto;
+        font-family: monospace;
+        font-size: 0.9em;
+        margin: 1.5rem 0;
+    }
+}
+
+/* Custom Scrollbar Sederhana */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
