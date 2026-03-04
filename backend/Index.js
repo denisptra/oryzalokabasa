@@ -3,6 +3,10 @@ const app = require('./src/app');
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 CMS Server running on https://oryzalokabasa.vercel.app/`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 CMS Server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
