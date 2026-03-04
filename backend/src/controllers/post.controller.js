@@ -14,7 +14,9 @@ exports.createPost = async (req, res) => {
 
     // Handle thumbnail file upload
     if (req.file) {
-      data.thumbnail = `/uploads/posts/${req.file.filename}`;
+      data.thumbnail = req.file.path && req.file.path.startsWith("http")
+        ? req.file.path
+        : `/uploads/posts/${req.file.filename}`;
     }
 
     const post = await postService.createPost(data, req.user.id);
@@ -32,7 +34,7 @@ exports.createPost = async (req, res) => {
       data: post,
     });
   } catch (error) {
-    if (req.file) {
+    if (req.file && (!req.file.path || !req.file.path.startsWith("http"))) {
       const filePath = path.join(__dirname, "../../uploads/posts", req.file.filename);
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
@@ -125,8 +127,10 @@ exports.updatePost = async (req, res) => {
 
     // Handle thumbnail file upload
     if (req.file) {
-      updateData.thumbnail = `/uploads/posts/${req.file.filename}`;
-      // Delete old thumbnail
+      updateData.thumbnail = req.file.path && req.file.path.startsWith("http")
+        ? req.file.path
+        : `/uploads/posts/${req.file.filename}`;
+      // Delete old thumbnail if it's a local file
       try {
         const old = await postService.getPostById(req.params.id);
         if (old.thumbnail && old.thumbnail.startsWith("/uploads/")) {

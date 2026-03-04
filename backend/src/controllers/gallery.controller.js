@@ -18,7 +18,9 @@ exports.uploadImage = async (req, res) => {
     // Get image path from uploaded file
     let imagePath = "";
     if (req.file) {
-      imagePath = `/uploads/gallery/${req.file.filename}`;
+      imagePath = req.file.path && req.file.path.startsWith("http")
+        ? req.file.path
+        : `/uploads/gallery/${req.file.filename}`;
     } else if (req.body.image) {
       imagePath = req.body.image;
     } else {
@@ -51,7 +53,7 @@ exports.uploadImage = async (req, res) => {
     });
   } catch (error) {
     // Clean up uploaded file on error
-    if (req.file) {
+    if (req.file && (!req.file.path || !req.file.path.startsWith("http"))) {
       const filePath = path.join(__dirname, "../../uploads/gallery", req.file.filename);
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
@@ -171,7 +173,9 @@ exports.updateGallery = async (req, res) => {
 
     // If a new file was uploaded, update the image path
     if (req.file) {
-      updateData.image = `/uploads/gallery/${req.file.filename}`;
+      updateData.image = req.file.path && req.file.path.startsWith("http")
+        ? req.file.path
+        : `/uploads/gallery/${req.file.filename}`;
 
       // Delete old image file if it's a local upload
       try {

@@ -17,7 +17,9 @@ exports.createSlider = async (req, res) => {
   try {
     let imagePath = "";
     if (req.file) {
-      imagePath = `/uploads/hero-slider/${req.file.filename}`;
+      imagePath = req.file.path && req.file.path.startsWith("http")
+        ? req.file.path
+        : `/uploads/hero-slider/${req.file.filename}`;
     } else if (req.body.image) {
       imagePath = req.body.image;
     } else {
@@ -51,7 +53,7 @@ exports.createSlider = async (req, res) => {
       data: slider,
     });
   } catch (error) {
-    if (req.file) {
+    if (req.file && (!req.file.path || !req.file.path.startsWith("http"))) {
       const filePath = path.join(__dirname, "../../uploads/hero-slider", req.file.filename);
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
@@ -136,7 +138,9 @@ exports.updateSlider = async (req, res) => {
 
     // Handle file upload
     if (req.file) {
-      updateData.image = `/uploads/hero-slider/${req.file.filename}`;
+      updateData.image = req.file.path && req.file.path.startsWith("http")
+        ? req.file.path
+        : `/uploads/hero-slider/${req.file.filename}`;
       // Delete old image
       try {
         const old = await heroSliderService.getSliderById(req.params.id);
