@@ -1,6 +1,6 @@
 // API Client Configuration
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://oryzalokabasa-backend.vercel.app/api";
+  process.env.NEXT_PUBLIC_API_URL || "https://oryzalokabasa-mkce.vercel.app/api";
 
 // Helper to get auth token from sessionStorage
 const getToken = () => {
