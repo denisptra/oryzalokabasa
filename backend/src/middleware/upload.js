@@ -16,9 +16,19 @@ if (useCloudinary) {
 }
 
 // Ensure local uploads directory exists
-const uploadsDir = path.join(__dirname, "../../uploads");
-if (!useCloudinary && !fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+const uploadsDir = isProduction
+    ? path.join("/tmp", "uploads")
+    : path.join(__dirname, "../../uploads");
+
+if (!useCloudinary) {
+    try {
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+    } catch (err) {
+        console.warn("Warning: Could not create uploads directory. If you are on Vercel, this is expected as the filesystem is read-only. Please configure Cloudinary for file uploads.");
+    }
 }
 
 // Local Storage configuration
@@ -26,8 +36,12 @@ const localStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         const type = req.uploadType || "general";
         const dir = path.join(uploadsDir, type);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
+        try {
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+        } catch (err) {
+            console.warn("Warning: Could not create directory", dir);
         }
         cb(null, dir);
     },
