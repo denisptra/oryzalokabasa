@@ -5,7 +5,7 @@ import { postAPI, getImageUrl } from "@/lib/api";
 import ShareBlock from "./ShareBlock";
 import PageTracker from "./PageTracker";
 import parse from "html-react-parser";
-import DOMPurify from "isomorphic-dompurify";
+import ImageFallback from "@/components/ImageFallback";
 import { Playfair_Display, Inter } from "next/font/google";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"] });
@@ -88,7 +88,7 @@ const ArticleMeta = ({ author, createdAt, title }) => (
 
 const TrendingSection = ({ posts }) => {
   if (!posts || posts.length === 0) return null;
-  
+
   return (
     <section className="mt-20 pt-16 border-t border-slate-100">
       <h2 className={`${playfair.className} text-2xl md:text-3xl font-bold text-blue-950 mb-8`}>
@@ -98,7 +98,7 @@ const TrendingSection = ({ posts }) => {
         {posts.map((post) => (
           <Link key={post.id} href={`/insight/${post.slug || post.id}`} className="group flex flex-col">
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 mb-4 shadow-sm group-hover:shadow-lg transition-all">
-              <img
+              <ImageFallback
                 src={post.thumbnail ? getImageUrl(post.thumbnail) : "/fallback.jpg"}
                 alt={post.title}
                 loading="lazy"
@@ -143,32 +143,27 @@ export default async function DetailBerita({ params }) {
 
   // PEMBERSIHAN KONTEN: Hapus &nbsp; yang menyebabkan spasi bolong-bolong saat text-justify
   const rawContent = article.content || "";
-  const noNbspContent = rawContent.replace(/&nbsp;/g, ' ');
-
-  const cleanHtml = DOMPurify.sanitize(noNbspContent, {
-    ADD_ATTR: ["class", "style", "target", "rel", "data-list"],
-    ADD_TAGS: ["iframe", "span", "video", "source"],
-  });
+  const cleanHtml = rawContent.replace(/&nbsp;/g, ' ');
 
   return (
     <div className={`min-h-screen bg-white pb-24 ${inter.className} overflow-x-hidden`}>
       <main className="max-w-4xl mx-auto px-6 py-10 md:py-16">
-        
+
         <Breadcrumb category={article.category} title={article.title} />
 
         <header className="mb-10">
           <PageTracker postId={article.id} />
-          
+
           <h1 className={`${playfair.className} text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-8 text-blue-950 tracking-tight text-pretty`}>
             {article.title}
           </h1>
-          
+
           <ArticleMeta author={article.author} createdAt={article.createdAt} title={article.title} />
         </header>
 
         <figure className="mb-12">
           <div className="rounded-3xl overflow-hidden bg-slate-50 shadow-xl relative aspect-video md:aspect-[21/9]">
-            <img
+            <ImageFallback
               src={article.thumbnail ? getImageUrl(article.thumbnail) : "/fallback.jpg"}
               alt={article.title}
               loading="lazy"
@@ -183,7 +178,7 @@ export default async function DetailBerita({ params }) {
         </figure>
 
         {/* PERBAIKAN: Lebar dibatasi (max-w-3xl mx-auto) agar jarak justify tidak "bolong", dan ditambah !whitespace-normal !break-words */}
-        <article 
+        <article
           className="ql-editor prose prose-slate max-w-3xl mx-auto w-full text-justify prose-p:text-justify [&_*]:!whitespace-normal [&_*]:!break-words prose-a:break-all prose-p:text-gray-600 prose-p:leading-[1.9] prose-p:mb-6 prose-headings:text-blue-950 prose-img:rounded-2xl prose-img:mx-auto prose-a:text-yellow-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-blue-950 prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:overflow-x-auto"
         >
           {parse(cleanHtml)}

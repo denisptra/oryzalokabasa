@@ -7,6 +7,7 @@ import { Search, Calendar, Clock, Loader, ChevronLeft, ChevronRight } from "luci
 import { postAPI, categoryAPI, getImageUrl } from "@/lib/api";
 import { Inter, Playfair_Display } from "next/font/google";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ImageFallback from "@/components/ImageFallback";
 
 const inter = Inter({ subsets: ["latin"] });
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"] });
@@ -28,18 +29,18 @@ const PageHeader = () => (
     <motion.div initial="hidden" animate="visible" variants={slowFadeUp} className="max-w-full mx-auto flex flex-col items-center">
       {/* Garis dan Tag Wawasan */}
       <div className="flex items-center justify-center gap-4 mb-4 md:mb-6">
-        <div className="w-max md:w-16 h-[1px] bg-gray-300"></div>
+        <div className="w-max md:w-16 h-px bg-gray-300"></div>
         <span className="text-blue-950 font-bold text-[10px] md:text-xs tracking-[0.15em] uppercase">
           Wawasan & Literasi
         </span>
-        <div className="w-10 md:w-16 h-[1px] bg-gray-300"></div>
+        <div className="w-10 md:w-16 h-px bg-gray-300"></div>
       </div>
-      
+
       {/* Judul Utama - Dioptimasi untuk Mobile & Desktop */}
       <h1 className={`${playfair.className} text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-blue-950 mb-4 md:mb-6 leading-tight`}>
         Arsip Wawasan & Literasi Budaya
       </h1>
-      
+
       {/* Subjudul */}
       <p className="text-gray-500 text-sm md:text-base leading-relaxed px-4">
         Catatan, refleksi, dan dokumentasi kegiatan seni dan budaya Oryza Lokabasa sebagai ruang belajar dan dialog publik.
@@ -90,12 +91,11 @@ const ArticleCard = ({ article, isHeadline, language, t }) => (
   >
     <Link href={`/insight/${article.slug || article.id}`} className="contents group">
       {/* Gambar Thumbnail - Menggunakan aspect ratio agar tidak gepeng di HP */}
-      <div className={`relative rounded-2xl overflow-hidden shrink-0 bg-slate-100 w-full ${isHeadline ? "md:col-span-1 lg:col-span-2 aspect-video md:aspect-auto md:h-[420px]" : "aspect-[4/3] md:h-52"}`}>
-        <img
+      <div className={`relative rounded-2xl overflow-hidden shrink-0 bg-slate-100 w-full ${isHeadline ? "md:col-span-1 lg:col-span-2 aspect-video md:aspect-auto md:h-[420px]" : "aspect-4/3 md:h-52"}`}>
+        <ImageFallback
           src={article.thumbnail ? getImageUrl(article.thumbnail) : "/fallback.jpg"}
           alt={article.title}
           loading="lazy"
-          onError={(e) => { e.target.onerror = null; e.target.src = "/fallback.jpg"; }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         />
         <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded shadow-sm">
@@ -104,7 +104,7 @@ const ArticleCard = ({ article, isHeadline, language, t }) => (
           </span>
         </div>
       </div>
-      
+
       {/* Konten Teks */}
       <div className={`flex flex-col ${isHeadline ? "md:col-span-1 lg:col-span-1 justify-center" : "mt-4 md:mt-6"}`}>
         <h3 className={`${playfair.className} font-bold text-blue-950 group-hover:text-blue-700 transition-colors leading-tight mb-3 md:mb-4 ${isHeadline ? "text-2xl md:text-3xl lg:text-4xl" : "text-lg md:text-xl"}`}>
@@ -115,11 +115,11 @@ const ArticleCard = ({ article, isHeadline, language, t }) => (
         </p>
         <div className="flex items-center gap-3 md:gap-4 mt-4 md:mt-6 text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest flex-wrap">
           <span className="flex items-center gap-1.5">
-            <Calendar size={12} className="text-yellow-600" /> 
+            <Calendar size={12} className="text-yellow-600" />
             {new Date(article.createdAt).toLocaleDateString(language === "EN" ? "en-US" : "id-ID", { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase()}
           </span>
           <span className="flex items-center gap-1.5">
-            <Clock size={12} className="text-yellow-600" /> 
+            <Clock size={12} className="text-yellow-600" />
             {t("insight.read_time") || "5 MIN READ"}
           </span>
         </div>
@@ -181,7 +181,7 @@ export default function WawasanPage() {
 
       <section className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          
+
           <FilterSidebar categories={categories} activeFilters={activeFilters} toggleFilter={toggleFilter} t={t} />
 
           <div className="lg:w-3/4">
