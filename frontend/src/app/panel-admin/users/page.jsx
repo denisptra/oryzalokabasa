@@ -51,7 +51,7 @@ export default function UsersPage() {
 
     // Fetch users
     const fetchUsers = async () => {
-        setLoading(true);
+        // // setLoading(true);
         try {
             const res = await userAPI.getAll();
             setUsers(res.data || []);
@@ -112,7 +112,7 @@ export default function UsersPage() {
     // Handle submit
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSaving(true);
+        // setSaving(true);
         setError("");
         try {
             if (editingUser) {

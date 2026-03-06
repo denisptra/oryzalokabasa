@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,6 +21,7 @@ import {
     Menu,
     X,
 } from "lucide-react";
+import { diagnostikAPI } from "@/lib/api";
 
 const menuItems = [
     {
@@ -60,6 +61,12 @@ const menuItems = [
         roles: ["ADMIN", "SUPER_ADMIN"],
     },
     {
+        label: "Anggota (Tim)",
+        href: "/panel-admin/team",
+        icon: Users,
+        roles: ["ADMIN", "SUPER_ADMIN"],
+    },
+    {
         label: "Pesan Kontak",
         href: "/panel-admin/contacts",
         icon: MessageSquare,
@@ -82,6 +89,16 @@ const menuItems = [
 export default function AdminSidebar() {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
+    // Notification badges map
+    const [badges, setBadges] = useState({
+        messages: 0,
+        users: 0,
+        logs: 0,
+        _rawUsers: 0,
+        _rawLogs: 0
+    });
+
+    // Core routing & hooks
     const pathname = usePathname();
     const router = useRouter();
     const { user, logout } = useAuth();
@@ -91,6 +108,76 @@ export default function AdminSidebar() {
     const filteredMenu = menuItems.filter((item) =>
         item.roles.includes(userRole)
     );
+
+    const getSeenCount = (key) => {
+        if (typeof window !== "undefined") {
+            return parseInt(localStorage.getItem(key) || '0', 10);
+        }
+        return 0;
+    };
+
+    const setSeenCount = (key, value) => {
+        if (typeof window !== "undefined") {
+            localStorage.setItem(key, value.toString());
+        }
+    };
+
+    // Fetch pesan unread dan update setiap 30 detik
+    const fetchSidebarStats = async () => {
+        try {
+            const res = await diagnostikAPI.getSidebarStats();
+            if (res.data) {
+                const rawUsers = res.data.newUsers || 0;
+                const rawLogs = res.data.newLogs || 0;
+
+                let usersBadge = 0;
+                let logsBadge = 0;
+
+                if (!pathname?.startsWith('/panel-admin/users')) {
+                    const seenUsers = getSeenCount('seen_users_count');
+                    usersBadge = Math.max(0, rawUsers - seenUsers);
+                } else {
+                    setSeenCount('seen_users_count', rawUsers);
+                }
+
+                if (!pathname?.startsWith('/panel-admin/logs')) {
+                    const seenLogs = getSeenCount('seen_logs_count');
+                    logsBadge = Math.max(0, rawLogs - seenLogs);
+                } else {
+                    setSeenCount('seen_logs_count', rawLogs);
+                }
+
+                setBadges({
+                    messages: res.data.unreadMessages || 0,
+                    users: usersBadge,
+                    logs: logsBadge,
+                    _rawUsers: rawUsers,
+                    _rawLogs: rawLogs
+                });
+            }
+        } catch (error) {
+            console.error("Failed to fetch sidebar stats", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSidebarStats();
+        // Check for new notifications every 30 seconds
+        const interval = setInterval(fetchSidebarStats, 30000);
+        return () => clearInterval(interval);
+    }, [pathname]);
+
+    // Clear badge ketika halaman sedang aktif atau baru saja dibuka
+    useEffect(() => {
+        if (pathname?.startsWith('/panel-admin/users') && badges._rawUsers > 0) {
+            setSeenCount('seen_users_count', badges._rawUsers);
+            setBadges(prev => ({ ...prev, users: 0 }));
+        }
+        if (pathname?.startsWith('/panel-admin/logs') && badges._rawLogs > 0) {
+            setSeenCount('seen_logs_count', badges._rawLogs);
+            setBadges(prev => ({ ...prev, logs: 0 }));
+        }
+    }, [pathname, badges._rawUsers, badges._rawLogs]);
 
     const handleLogout = async () => {
         try {
@@ -111,9 +198,9 @@ export default function AdminSidebar() {
             {/* Logo / Brand */}
             <div className="flex items-center gap-3 px-4 py-5 border-b border-slate-700/50">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20">
-                <Link href="/">
-                    <img src="/Logo-2.png" alt="Logo" className="w-full h-full object-cover" />
-                </Link>
+                    <Link href="/">
+                        <img src="/Logo-2.png" alt="Logo" className="w-full h-full object-cover" />
+                    </Link>
                 </div>
                 {!collapsed && (
                     <div className="overflow-hidden">
@@ -147,14 +234,50 @@ export default function AdminSidebar() {
                             {active && (
                                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-amber-400 rounded-r-full" />
                             )}
-                            <Icon
-                                size={20}
-                                className={`flex-shrink-0 transition-colors ${active
+                            <div className="relative flex-shrink-0">
+                                <Icon
+                                    size={20}
+                                    className={`transition-colors ${active
                                         ? "text-amber-400"
                                         : "text-slate-400 group-hover:text-white"
-                                    }`}
-                            />
-                            {!collapsed && <span>{item.label}</span>}
+                                        }`}
+                                />
+                                {item.label === "Pesan Kontak" && badges.messages > 0 && !active && (
+                                    <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow ring-2 ring-slate-900 border-none">
+                                        {badges.messages > 99 ? '99+' : badges.messages}
+                                    </span>
+                                )}
+                                {item.label === "Pengguna" && badges.users > 0 && !active && (
+                                    <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[9px] font-bold text-white shadow ring-2 ring-slate-900 border-none">
+                                        {badges.users > 99 ? '99+' : badges.users}
+                                    </span>
+                                )}
+                                {item.label === "Log Aktivitas" && badges.logs > 0 && !active && (
+                                    <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-500 text-[9px] font-bold text-white shadow ring-2 ring-slate-900 border-none">
+                                        {badges.logs > 99 ? '99+' : badges.logs}
+                                    </span>
+                                )}
+                            </div>
+                            {!collapsed && (
+                                <div className="flex-1 flex justify-between items-center">
+                                    <span>{item.label}</span>
+                                    {item.label === "Pesan Kontak" && badges.messages > 0 && !active && (
+                                        <span className="px-2 py-0.5 text-[10px] font-semibold bg-red-500 text-white rounded-full ml-auto shadow-sm">
+                                            {badges.messages > 99 ? '99+' : badges.messages} Baru
+                                        </span>
+                                    )}
+                                    {item.label === "Pengguna" && badges.users > 0 && !active && (
+                                        <span className="px-2 py-0.5 text-[10px] font-semibold bg-blue-500 text-white rounded-full ml-auto shadow-sm">
+                                            {badges.users > 99 ? '99+' : badges.users} Baru
+                                        </span>
+                                    )}
+                                    {item.label === "Log Aktivitas" && badges.logs > 0 && !active && (
+                                        <span className="px-2 py-0.5 text-[10px] font-semibold bg-indigo-500 text-white rounded-full ml-auto shadow-sm">
+                                            {badges.logs > 99 ? '99+' : badges.logs} Baru
+                                        </span>
+                                    )}
+                                </div>
+                            )}
                         </Link>
                     );
                 })}

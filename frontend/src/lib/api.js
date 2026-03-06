@@ -10,12 +10,32 @@ const getToken = () => {
   return null;
 };
 
+// Cache in-memory untuk menyimpan hasil fetching GET supaya rendering instant
+const getCache = new Map();
+
 // Fetch wrapper with common headers
-export const apiFetch = async (endpoint, options = {}) => {
+export const apiFetch = async (endpoint, options = {}, skipCache = false) => {
   const url = `${API_BASE_URL}${endpoint}`;
-  const headers = {
-    ...options.headers,
-  };
+  const isGet = !options.method || options.method === "GET";
+
+  // Jika sedang di browser, dan method GET, dan cache tidak di-skip
+  if (typeof window !== "undefined" && isGet && !skipCache && getCache.has(url)) {
+    // Jalan asinkron di background untuk memastikan data ter-update
+    fetchData(url, options, endpoint).then(freshData => {
+      // Jika freshData berbeda dari cache, kita update map (berguna untuk next load)
+      getCache.set(url, freshData);
+    }).catch(() => { });
+
+    // Langsung return data cache seketika
+    return getCache.get(url);
+  }
+
+  return fetchData(url, options, endpoint, isGet);
+};
+
+// Internal fetch logic
+const fetchData = async (url, options, endpoint, isGet) => {
+  const headers = { ...options.headers };
 
   // Only set Content-Type for non-FormData requests
   if (!(options.body instanceof FormData)) {
@@ -38,6 +58,27 @@ export const apiFetch = async (endpoint, options = {}) => {
 
   if (!response.ok) {
     throw new Error(data.message || "API request failed");
+  }
+
+  // Simpan ke cache jika sukses dan metodenya GET
+  if (typeof window !== "undefined" && isGet) {
+    getCache.set(url, data);
+  } else if (typeof window !== "undefined" && !isGet) {
+    // Ekstraksi path utama (contoh: '/team/create' -> 'team')
+    const segments = endpoint.split('/').filter(Boolean);
+    const basePath = segments[0] || '';
+
+    // HANYA KOSONGKAN CACHE untuk endpoint yang berkaitan
+    // Dengan ini, edit "Tim" tidak akan membuat "Gallery" atau "Artikel" lambat lagi.
+    if (basePath) {
+      for (const key of getCache.keys()) {
+        if (key.includes(`/${basePath}`) || (basePath === 'user' && key.includes('/users'))) {
+          getCache.delete(key);
+        }
+      }
+    } else {
+      getCache.clear();
+    }
   }
 
   return data;
@@ -391,6 +432,71 @@ export const heroSliderAPI = {
   },
 };
 
+// ===================== TEAM MEMBER API =====================
+export const teamAPI = {
+  getAll: async () => {
+    return apiFetch("/team/");
+  },
+
+  getActive: async () => {
+    return apiFetch("/team/active");
+  },
+
+  getById: async (id) => {
+    return apiFetch(`/team/${id}`);
+  },
+
+  // Create with file upload
+  create: async (data) => {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("role", data.role);
+    if (data.imageFile) formData.append("image", data.imageFile);
+    formData.append("isActive", data.isActive !== false ? "true" : "false");
+    formData.append("order", String(data.order || 0));
+
+    return apiFetch("/team/create", {
+      method: "POST",
+      body: formData,
+    });
+  },
+
+  // Update with optional new file
+  update: async (id, data) => {
+    const formData = new FormData();
+    if (data.name) formData.append("name", data.name);
+    if (data.role) formData.append("role", data.role);
+    if (data.imageFile) formData.append("image", data.imageFile);
+    if (data.isActive !== undefined)
+      formData.append("isActive", data.isActive ? "true" : "false");
+    if (data.order !== undefined) formData.append("order", String(data.order));
+
+    return apiFetch(`/team/update/${id}`, {
+      method: "PUT",
+      body: formData,
+    });
+  },
+
+  toggle: async (id) => {
+    return apiFetch(`/team/toggle/${id}`, {
+      method: "PUT",
+    });
+  },
+
+  reorder: async (data) => {
+    return apiFetch("/team/reorder", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  },
+
+  delete: async (id) => {
+    return apiFetch(`/team/delete/${id}`, {
+      method: "DELETE",
+    });
+  },
+};
+
 // ===================== SETTINGS API =====================
 export const settingsAPI = {
   getByKey: async (key) => {
@@ -495,6 +601,16 @@ export const analyticsAPI = {
       method: "DELETE",
     });
   },
+};
+
+// ===================== DIAGNOSTIK API =====================
+export const diagnostikAPI = {
+  getStatus: async () => {
+    return apiFetch("/diagnostik/status");
+  },
+  getSidebarStats: async () => {
+    return apiFetch("/diagnostik/sidebar-stats");
+  }
 };
 
 // ===================== HELPER =====================

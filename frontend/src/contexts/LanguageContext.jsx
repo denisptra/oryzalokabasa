@@ -111,7 +111,7 @@ const translations = {
             quick_links: "Tautan",
             program: "Program",
             contact: "Hubungi Kami",
-            rights: "© 2024 Oryza Lokabasa. All Rights Reserved.",
+            rights: "© 2026 Oryza Lokabasa. All Rights Reserved.",
         }
     },
     EN: {

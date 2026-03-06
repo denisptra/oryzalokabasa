@@ -11,15 +11,28 @@ const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"] }
 export const Footer = () => {
   const { t } = useLanguage();
 
+  const quickLinks = [
+    { name: t("nav.home"), path: "/" },
+    { name: t("nav.about"), path: "/about" },
+    { name: t("nav.insight"), path: "/insight" },
+    { name: t("nav.gallery"), path: "/gallery" },
+  ];
+
+  const programs = [
+    t("home.pillar_1_title"),
+    t("home.pillar_2_title"),
+    t("home.pillar_3_title"),
+  ];
+
   return (
     <footer className={`${inter.className} bg-[#1A1F4D] text-white pt-16 pb-8`}>
       <div className="max-w-7xl mx-auto px-6">
         
-        {/* Grid Utama: 1.5 bagian untuk Deskripsi, 2 bagian untuk Menu (Link, Program, Kontak) */}
-        <div className="grid grid-cols-1 md:grid-cols-[1.5fr_2fr] gap-12 border-b border-white/10 pb-12">
+        {/* Menggunakan grid 12 kolom agar proporsi jarak lebih mudah dikontrol di Desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 border-b border-white/10 pb-12">
           
-          {/* SISI KIRI: Branding & Deskripsi */}
-          <div className="space-y-4">
+          {/* SISI KIRI: Branding & Deskripsi (Mengambil 5 kolom) */}
+          <div className="lg:col-span-5 space-y-4">
             <h2 className={`${playfair.className} text-xl font-bold text-white`}>
               Oryza Lokabasa.
             </h2>
@@ -28,17 +41,21 @@ export const Footer = () => {
             </p>
           </div>
 
-          {/* SISI KANAN: Grid untuk Link, Program, dan Kontak (Berdekatan) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          {/* SISI KANAN: Grid Link, Program, & Kontak (Mengambil 7 kolom) */}
+          {/* gap-6 membuat jarak antar 3 kolom ini lebih rapat dan tidak kejauhan */}
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
             
             {/* Tautan Situs */}
             <div>
               <h3 className="font-bold mb-6 text-xs uppercase tracking-[0.2em]">{t("footer.quick_links")}</h3>
               <ul className="space-y-3 text-sm text-gray-400">
-                <li><Link href="/" className="hover:text-yellow-500 transition">{t("nav.home")}</Link></li>
-                <li><Link href="/about" className="hover:text-yellow-500 transition">{t("nav.about")}</Link></li>
-                <li><Link href="/insight" className="hover:text-yellow-500 transition">{t("nav.insight")}</Link></li>
-                <li><Link href="/gallery" className="hover:text-yellow-500 transition">{t("nav.gallery")}</Link></li>
+                {quickLinks.map((link, idx) => (
+                  <li key={idx}>
+                    <Link href={link.path} className="hover:text-yellow-500 transition">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -46,9 +63,11 @@ export const Footer = () => {
             <div>
               <h3 className="font-bold mb-6 text-xs uppercase tracking-[0.2em]">{t("footer.program")}</h3>
               <ul className="space-y-3 text-sm text-gray-400">
-                <li className="hover:text-white transition-colors cursor-default">{t("home.pillar_1_title")}</li>
-                <li className="hover:text-white transition-colors cursor-default">{t("home.pillar_2_title")}</li>
-                <li className="hover:text-white transition-colors cursor-default">{t("home.pillar_3_title")}</li>
+                {programs.map((prog, idx) => (
+                  <li key={idx} className="hover:text-white transition-colors cursor-default">
+                    {prog}
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -57,16 +76,20 @@ export const Footer = () => {
               <h3 className="font-bold mb-6 text-xs uppercase tracking-[0.2em]">{t("footer.contact")}</h3>
               <div className="space-y-4 text-sm text-gray-400">
                 <div className="flex items-center gap-3">
-                  <Phone size={14} className="text-yellow-500 shrink-0" />
-                  <span>+62 878 7245 0987</span>
+                  <Phone size={16} className="text-yellow-500 shrink-0" />
+                  <span>021-7984948</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Mail size={14} className="text-yellow-500 shrink-0" />
+                  <Mail size={16} className="text-yellow-500 shrink-0" />
                   <span>info@oryzalokabasa.com</span>
                 </div>
+                
+                {/* ALAMAT: Dibuat sejajar ikonnya dan teksnya dirapikan */}
                 <div className="flex items-start gap-3">
-                  <MapPin size={16} className="text-yellow-500 shrink-0 mt-0.5" />
-                  <span className="leading-tight text-xs">Jl. Menteng Dalam No. 22, Jakarta Pusat</span>
+                  <MapPin size={18} className="text-yellow-500 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">
+                    Komp. BSE L11 Jl. Cikoko Barat 1, Pancoran Jak-Sel (12770)
+                  </span>
                 </div>
               </div>
             </div>

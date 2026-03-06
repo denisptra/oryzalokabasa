@@ -82,7 +82,7 @@ export default function PostsPage() {
     );
 
     const fetchData = async () => {
-        setLoading(true);
+        // // setLoading(true);
         try {
             const [postsRes, catRes] = await Promise.all([
                 postAPI.getAll("status=all"),
@@ -174,7 +174,7 @@ export default function PostsPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSaving(true);
+        // setSaving(true);
         setError("");
         try {
             const data = { ...formData };
@@ -377,7 +377,7 @@ export default function PostsPage() {
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200 hidden sm:block">
                                                     {post.thumbnail ? (
-                                                        <img src={getImageUrl(post.thumbnail)} alt="" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = "none"; }} />
+                                                        <img src={getImageUrl(post.thumbnail)} alt="" className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = "/Logo-1.png"; }} />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center bg-slate-50">
                                                             <ImageIcon size={16} className="text-slate-300" />

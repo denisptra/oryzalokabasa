@@ -50,7 +50,7 @@ export default function HeroSliderDashboardPage() {
     const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
 
     const fetchData = async () => {
-        setLoading(true);
+        // // setLoading(true);
         try {
             const res = await heroSliderAPI.getAll();
             setSliders(res.data || []);
@@ -132,7 +132,7 @@ export default function HeroSliderDashboardPage() {
             setError("Pilih gambar untuk slider");
             return;
         }
-        setSaving(true);
+        // setSaving(true);
         setError("");
         try {
             const data = { ...formData };
@@ -318,7 +318,7 @@ export default function HeroSliderDashboardPage() {
                                                         src={getImageUrl(slider.image)}
                                                         alt={slider.title}
                                                         className="w-full h-full object-cover"
-                                                        onError={(e) => { e.target.style.display = "none"; }}
+                                                        onError={(e) => { e.target.onerror = null; e.target.src = "/Logo-1.png"; }}
                                                     />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center">
@@ -347,8 +347,8 @@ export default function HeroSliderDashboardPage() {
                                             <button
                                                 onClick={() => handleToggle(slider.id)}
                                                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${slider.isActive
-                                                        ? "text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100"
-                                                        : "text-slate-500 bg-slate-50 border border-slate-200 hover:bg-slate-100"
+                                                    ? "text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100"
+                                                    : "text-slate-500 bg-slate-50 border border-slate-200 hover:bg-slate-100"
                                                     }`}
                                             >
                                                 {slider.isActive ? (

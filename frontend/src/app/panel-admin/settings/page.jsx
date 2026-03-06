@@ -41,7 +41,7 @@ export default function SettingsPage() {
     const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
 
     const fetchData = async () => {
-        setLoading(true);
+        // // setLoading(true);
         try {
             const res = await settingsAPI.getAll();
             setSettings(res.data || []);
@@ -95,7 +95,7 @@ export default function SettingsPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSaving(true);
+        // setSaving(true);
         setError("");
         try {
             await settingsAPI.save(formData);

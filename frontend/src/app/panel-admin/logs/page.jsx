@@ -49,7 +49,7 @@ export default function LogsPage() {
     const [detailLog, setDetailLog] = useState(null);
 
     const fetchData = async () => {
-        setLoading(true);
+        // // setLoading(true);
         try {
             const params = moduleFilter !== "all" ? `module=${moduleFilter}` : "";
             const res = await logAPI.getAll(params);

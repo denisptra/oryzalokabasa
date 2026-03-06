@@ -66,3 +66,46 @@ exports.getDiagnostik = async (req, res) => {
     });
   }
 };
+
+/**
+ * SIDEBAR STATS - Get notifications counts for sidebar
+ */
+exports.getSidebarStats = async (req, res) => {
+  try {
+    const { PrismaClient } = require("@prisma/client");
+    const prisma = new PrismaClient();
+
+    // Hitung pesan unread
+    const unreadMessages = await prisma.contactMessage.count({
+      where: { status: "UNREAD" },
+    });
+
+    // Hitung pengguna baru (7 hari terakhir)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const newUsers = await prisma.user.count({
+      where: { createdAt: { gte: sevenDaysAgo } },
+    });
+
+    // Hitung log baru (hari ini)
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const newLogs = await prisma.log.count({
+      where: { createdAt: { gte: startOfDay } },
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        unreadMessages,
+        newUsers,
+        newLogs,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};

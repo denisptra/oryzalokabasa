@@ -58,8 +58,7 @@ const getCloudinaryStorage = (folderName) => {
         cloudinary: cloudinary,
         params: {
             folder: `oryzalokabasa/${folderName}`,
-            // format: async (req, file) => 'png', // supports promises as well
-            // public_id: (req, file) => 'computed-filename-using-request',
+            transformation: [{ width: 1200, crop: "limit", quality: "auto", fetch_format: "auto" }],
         },
     });
 };
@@ -109,6 +108,12 @@ const uploadPost = multer({
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
+const uploadTeam = multer({
+    storage: getStorage('team'),
+    fileFilter: imageFilter,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
+
 // Middleware to set upload type
 const setUploadType = (type) => (req, res, next) => {
     req.uploadType = type;
@@ -119,6 +124,7 @@ module.exports = {
     uploadGallery,
     uploadHeroSlider,
     uploadPost,
+    uploadTeam,
     setUploadType,
     uploadsDir,
 };

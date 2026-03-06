@@ -38,7 +38,7 @@ export default function ContactsPage() {
     const [error, setError] = useState("");
 
     const fetchMessages = async () => {
-        setLoading(true);
+        // // setLoading(true);
         try {
             const res = await contactAPI.getAll();
             setMessages(res.data || []);

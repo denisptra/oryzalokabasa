@@ -49,7 +49,7 @@ export default function GalleryDashboardPage() {
     const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
 
     const fetchData = async () => {
-        setLoading(true);
+        // // setLoading(true);
         try {
             const [galRes, catRes] = await Promise.all([
                 galleryAPI.getAll(),
@@ -130,7 +130,7 @@ export default function GalleryDashboardPage() {
             setError("Pilih gambar untuk diupload");
             return;
         }
-        setSaving(true);
+        // setSaving(true);
         setError("");
         try {
             const data = { ...formData };
@@ -325,7 +325,7 @@ export default function GalleryDashboardPage() {
                                                         src={getImageUrl(item.image)}
                                                         alt={item.title}
                                                         className="w-full h-full object-cover"
-                                                        onError={(e) => { e.target.style.display = "none"; }}
+                                                        onError={(e) => { e.target.onerror = null; e.target.src = "/Logo-1.png"; }}
                                                     />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center">

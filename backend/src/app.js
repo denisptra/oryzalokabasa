@@ -14,6 +14,7 @@ const settingsRoutes = require("./routes/settings.routes");
 const logRoutes = require("./routes/log.routes");
 const analyticsRoutes = require("./routes/analytics.routes");
 const diagnostikRoutes = require("./routes/diagnostik.routes");
+const teamRoutes = require("./routes/team.routes");
 
 const app = express();
 
@@ -24,7 +25,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded files
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+const uploadsPath = isProduction ? path.join("/tmp", "uploads") : path.join(__dirname, "../uploads");
+app.use("/uploads", express.static(uploadsPath));
 
 // Routes
 app.use("/api", authRoutes); // Auth: register, login, logout
@@ -38,6 +41,7 @@ app.use("/api", settingsRoutes); // Settings config (PUBLIC read, SUPER_ADMIN ma
 app.use("/api", logRoutes); // Audit logs (SUPER_ADMIN only)
 app.use("/api/analytics", analyticsRoutes); // Analytics & page views tracking
 app.use("/api/diagnostik", diagnostikRoutes); // System diagnostik
+app.use("/api", teamRoutes); // Team Members CRUD
 
 app.get("/", (req, res) => {
   res.json({

@@ -35,7 +35,7 @@ export default function CategoriesPage() {
     const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
 
     const fetchCategories = async () => {
-        setLoading(true);
+        // // setLoading(true);
         try {
             const res = await categoryAPI.getAll();
             setCategories(res.data || []);
@@ -89,7 +89,7 @@ export default function CategoriesPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSaving(true);
+        // setSaving(true);
         setError("");
         try {
             if (editingCat) {

@@ -39,15 +39,6 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-// --- CONTENT MANAGEMENT ---
-
-// POST - Postingan/Artikel
-// Perubahan dari News:
-// - Nama model berubah dari News → Post
-// - tags sekarang String (comma-separated) bukan relationship
-// - Tidak ada lagi relasi many-to-many dengan Tag model
-// Contoh tags: "javascript, nodejs, express" atau "olahraga, sepak bola"
-
 model Post {
   id              String        @id @default(uuid())
   title           String
@@ -79,15 +70,6 @@ model Category {
   galleries Gallery[]
 }
 
-// GALLERY - Galeri Foto/Gambar dengan Tanggal Kegiatan
-// Perubahan:
-// - Tambah field eventDate untuk tanggal kegiatan/event
-// - Berguna untuk foto dokumentasi kegiatan/event tertentu
-// Contoh penggunaan:
-// - title: "Turnamen Sepak Bola 2024"
-// - image: "/uploads/IMG_001.jpg"
-// - eventDate: "2024-02-15" (tanggal acara berlangsung)
-
 model Gallery {
   id         String    @id @default(uuid())
   title      String
@@ -106,6 +88,16 @@ model HeroSlider {
   link     String?
   isActive Boolean @default(true)
   order    Int     @default(0)
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  image     String?
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
 }
 
 model ContactMessage {
@@ -154,19 +146,6 @@ model Log {
 }
 
 // --- GLOBAL SETTINGS ---
-
-// SETTING - Konfigurasi Global
-// Digunakan untuk menyimpan:
-// - Blog title
-// - Blog description
-// - Footer text
-// - Social media links
-// - Email config
-// - Dll
-// Contoh:
-// - key: "blog_title"    value: "Oryza Lokabasah"
-// - key: "blog_desc"     value: "Blog tentang..."
-// - key: "email_contact" value: "contact@example.com"
 
 model Setting {
   id    String @id @default(uuid())
