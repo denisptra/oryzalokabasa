@@ -156,7 +156,7 @@ export default function LogsPage() {
                                     <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
                                     <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Modul</th>
                                     <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Pengguna</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Waktu</th>
+                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Waktu</th>
                                     <th className="px-4 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Detail</th>
                                 </tr>
                             </thead>
@@ -195,7 +195,7 @@ export default function LogsPage() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-slate-500 hidden md:table-cell">
+                                        <td className="px-4 py-4 text-sm text-slate-500">
                                             <div className="flex items-center gap-1.5">
                                                 <Clock size={14} className="text-slate-400" />
                                                 <span>{formatDate(log.createdAt)}</span>

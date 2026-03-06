@@ -264,9 +264,9 @@ export default function UsersPage() {
                                     </th>
                                     <th className="px-4 py-4 w-12 text-center">No</th>
                                     <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Pengguna</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Email</th>
+                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
                                     <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Role</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden lg:table-cell">Dibuat</th>
+                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Dibuat</th>
                                     <th className="px-4 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
@@ -276,7 +276,7 @@ export default function UsersPage() {
                                         key={u.id}
                                         className={`hover:bg-slate-50/80 transition-colors ${selectedIds.includes(u.id) ? 'bg-blue-50/50' : ''}`}
                                     >
-                                        
+
                                         <td className="px-4 py-4 text-center">
                                             <input
                                                 type="checkbox"
@@ -293,23 +293,22 @@ export default function UsersPage() {
                                                 </div>
                                                 <div>
                                                     <span className="text-sm font-bold text-slate-800">{u.name}</span>
-                                                    <div className="text-xs text-slate-500 md:hidden">{u.email}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-slate-600 font-medium hidden md:table-cell">
+                                        <td className="px-4 py-4 text-sm text-slate-600 font-medium">
                                             {u.email}
                                         </td>
                                         <td className="px-4 py-4">
                                             <span className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider ${u.role === "SUPER_ADMIN"
-                                                    ? "bg-slate-800 text-white"
-                                                    : "bg-slate-100 text-slate-600 border border-slate-200"
+                                                ? "bg-slate-800 text-white"
+                                                : "bg-slate-100 text-slate-600 border border-slate-200"
                                                 }`}>
                                                 {u.role === "SUPER_ADMIN" ? <Shield size={12} /> : <User size={12} />}
                                                 {u.role === "SUPER_ADMIN" ? "Super Admin" : "Admin"}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-slate-500 hidden lg:table-cell">
+                                        <td className="px-4 py-4 text-sm text-slate-500">
                                             {u.createdAt
                                                 ? new Date(u.createdAt).toLocaleDateString("id-ID", {
                                                     day: "numeric",

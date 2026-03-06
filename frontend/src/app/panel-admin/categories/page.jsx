@@ -224,8 +224,8 @@ export default function CategoriesPage() {
                                         />
                                     </th>
                                     <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Kategori</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Deskripsi</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden lg:table-cell">Dibuat Pada</th>
+                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Deskripsi</th>
+                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Dibuat Pada</th>
                                     <th className="px-4 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
@@ -250,16 +250,15 @@ export default function CategoriesPage() {
                                                 </div>
                                                 <div className="min-w-0">
                                                     <span className="text-sm font-bold text-slate-800">{cat.name}</span>
-                                                    <div className="text-xs text-slate-500 md:hidden mt-0.5 max-w-[200px] truncate">{cat.description || <span className="italic">Tanpa deskripsi</span>}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-slate-600 hidden md:table-cell max-w-[300px]">
+                                        <td className="px-4 py-4 text-sm text-slate-600 max-w-[300px]">
                                             <div className="truncate">
                                                 {cat.description || <span className="italic text-slate-400">Tanpa deskripsi</span>}
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-slate-500 hidden lg:table-cell">
+                                        <td className="px-4 py-4 text-sm text-slate-500">
                                             {cat.createdAt
                                                 ? new Date(cat.createdAt).toLocaleDateString("id-ID", {
                                                     day: "numeric",

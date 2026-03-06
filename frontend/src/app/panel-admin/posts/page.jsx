@@ -352,10 +352,10 @@ export default function PostsPage() {
                                         />
                                     </th>
                                     <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Artikel</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Kategori</th>
+                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Kategori</th>
                                     <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden lg:table-cell">Views</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden lg:table-cell">Tanggal</th>
+                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Views</th>
+                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tanggal</th>
                                     <th className="px-4 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
@@ -375,7 +375,7 @@ export default function PostsPage() {
                                         </td>
                                         <td className="px-4 py-4">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200 hidden sm:block">
+                                                <div className="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200">
                                                     {post.thumbnail ? (
                                                         <img src={getImageUrl(post.thumbnail)} alt="" className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = "/Logo-1.png"; }} />
                                                     ) : (
@@ -403,7 +403,7 @@ export default function PostsPage() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-slate-600 font-medium hidden md:table-cell">
+                                        <td className="px-4 py-4 text-sm text-slate-600 font-medium">
                                             {post.category?.name || <span className="text-slate-400 italic">Tanpa Kategori</span>}
                                         </td>
                                         <td className="px-4 py-4">
@@ -411,13 +411,13 @@ export default function PostsPage() {
                                                 {post.status}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-slate-600 font-medium hidden lg:table-cell">
+                                        <td className="px-4 py-4 text-sm text-slate-600 font-medium">
                                             <div className="flex items-center gap-1.5">
                                                 <Eye size={14} className="text-slate-400" />
                                                 <span>{post.views || 0}</span>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-slate-500 hidden lg:table-cell">
+                                        <td className="px-4 py-4 text-sm text-slate-500">
                                             {post.createdAt ? new Date(post.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "-"}
                                         </td>
                                         <td className="px-4 py-4 text-right">

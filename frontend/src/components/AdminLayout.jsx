@@ -103,10 +103,17 @@ const AdminLayout = ({ children }) => {
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
+      {/* Sidebar Overlay for Mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <div
-        className={`${sidebarOpen ? "w-64" : "w-0"
-          } bg-slate-900 text-white transition-all duration-300 overflow-y-auto shadow-2xl`}
+        className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:relative inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transition-transform duration-300 overflow-y-auto shadow-2xl flex flex-col`}
       >
         <div className="p-6 border-b border-slate-800">
           <h1 className="text-xl font-bold">Oryza Admin</h1>
@@ -125,8 +132,8 @@ const AdminLayout = ({ children }) => {
                 key={item.label}
                 href={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${active
-                    ? "bg-blue-600 text-white shadow-lg"
-                    : "text-slate-300 hover:bg-slate-800"
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "text-slate-300 hover:bg-slate-800"
                   }`}
               >
                 <Icon size={20} />
