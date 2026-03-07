@@ -2,7 +2,7 @@
 
 import React from "react";
 
-export default function ImageFallback({ src, alt, className, fallbackSrc = "/fallback.jpg", ...props }) {
+export default function ImageFallback({ src, alt, className, fallbackSrc = "https://via.placeholder.com/800x600?text=Image+not+found", ...props }) {
     return (
         <img
             src={src || fallbackSrc}

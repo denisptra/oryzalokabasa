@@ -83,7 +83,7 @@ async function main() {
         slug: "getting-started-with-nextjs-16",
         content:
           "<h2>Introduction to Next.js 16</h2><p>Next.js 16 brings powerful new features including Turbopack for faster builds...</p>",
-        thumbnail: "/article-1.jpg",
+        thumbnail: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=500&fit=crop",
         metaTitle: "Next.js 16 Guide",
         metaDescription:
           "Learn the basics of Next.js 16 with this comprehensive guide",
@@ -100,7 +100,7 @@ async function main() {
         slug: "art-of-minimalist-living",
         content:
           "<h2>Embrace Simplicity</h2><p>Minimalism is not just about owning less, it's about living more intentionally...</p>",
-        thumbnail: "/article-2.jpg",
+        thumbnail: "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=800&h=500&fit=crop",
         metaTitle: "Minimalist Living",
         metaDescription: "Discover the benefits of minimalist living",
         tags: "lifestyle, minimalism, wellness",
@@ -116,7 +116,7 @@ async function main() {
         slug: "exploring-streets-of-tokyo",
         content:
           "<h2>Tokyo Travel Guide</h2><p>Discover hidden gems and must-visit places in Tokyo, Japan...</p>",
-        thumbnail: "/article-3.jpg",
+        thumbnail: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=500&fit=crop",
         metaTitle: "Tokyo Travel Guide",
         metaDescription: "Complete guide to exploring Tokyo",
         tags: "travel, japan, tokyo, asia",
@@ -132,7 +132,7 @@ async function main() {
         slug: "best-coffee-shops-in-bali",
         content:
           "<h2>Coffee Culture in Bali</h2><p>Bali has become a hub for coffee enthusiasts with amazing specialty coffee shops...</p>",
-        thumbnail: "/article-4.jpg",
+        thumbnail: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=500&fit=crop",
         metaTitle: "Coffee Shops in Bali",
         metaDescription: "Guide to the best coffee shops in Bali",
         tags: "food, coffee, bali, indonesia",
@@ -148,7 +148,7 @@ async function main() {
         slug: "future-of-ai-in-web-development",
         content:
           "<h2>AI Revolution</h2><p>Artificial Intelligence is transforming how we build web applications...</p>",
-        thumbnail: "/article-1.jpg",
+        thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=500&fit=crop",
         metaTitle: "AI in Web Development",
         metaDescription: "How AI is changing web development",
         tags: "technology, ai, machine-learning, web-development",
@@ -167,7 +167,7 @@ async function main() {
     prisma.gallery.create({
       data: {
         title: "Tokyo Street Photography",
-        image: "/galeri-1.jpg",
+        image: "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=600&h=400&fit=crop",
         eventDate: new Date("2024-01-15"),
         categoryId: categories[2].id,
       },
@@ -175,7 +175,7 @@ async function main() {
     prisma.gallery.create({
       data: {
         title: "Coffee Art",
-        image: "/galeri-2.jpg",
+        image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&h=400&fit=crop",
         eventDate: new Date("2024-02-20"),
         categoryId: categories[3].id,
       },
@@ -183,7 +183,7 @@ async function main() {
     prisma.gallery.create({
       data: {
         title: "Morning Light",
-        image: "/galeri-3.jpg",
+        image: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=600&h=400&fit=crop",
         eventDate: new Date("2024-01-25"),
         categoryId: categories[1].id,
       },
@@ -191,7 +191,7 @@ async function main() {
     prisma.gallery.create({
       data: {
         title: "Tech Conference 2024",
-        image: "/galeri-4.jpg",
+        image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=400&fit=crop",
         eventDate: new Date("2024-03-10"),
         categoryId: categories[0].id,
       },
@@ -199,7 +199,7 @@ async function main() {
     prisma.gallery.create({
       data: {
         title: "Bali Sunset",
-        image: "/galeri-5.jpg",
+        image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400&fit=crop",
         eventDate: new Date("2024-02-14"),
         categoryId: categories[2].id,
       },
@@ -207,7 +207,7 @@ async function main() {
     prisma.gallery.create({
       data: {
         title: "Minimalist Design",
-        image: "/galeri-6.jpg",
+        image: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=600&h=400&fit=crop",
         eventDate: new Date("2024-03-01"),
         categoryId: categories[1].id,
       },
@@ -222,7 +222,7 @@ async function main() {
       data: {
         title: "Welcome to Oryza",
         subtitle: "Discover amazing content",
-        image: "/Hero-1.jpg",
+        image: "https://images.unsplash.com/photo-1523050854058-8df90110c476?w=1200&h=500&fit=crop",
         link: "/about",
         isActive: true,
         order: 1,
@@ -232,7 +232,7 @@ async function main() {
       data: {
         title: "Explore Technology",
         subtitle: "Latest tech trends and tips",
-        image: "/Hero-2.jpg",
+        image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=500&fit=crop",
         link: "/category/technology",
         isActive: true,
         order: 2,
@@ -242,7 +242,7 @@ async function main() {
       data: {
         title: "Travel Stories",
         subtitle: "Inspiring journeys from around the world",
-        image: "/Hero-3.jpg",
+        image: "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1200&h=500&fit=crop",
         link: "/category/travel",
         isActive: true,
         order: 3,

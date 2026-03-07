@@ -87,13 +87,13 @@ const ArticleCard = ({ article, isHeadline, language, t }) => (
     whileInView="visible"
     viewport={{ once: true }}
     variants={slowFadeUp}
-    className={`${isHeadline ? "md:col-span-3 grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-8" : "flex flex-col"}`}
+    className={isHeadline ? "col-span-1 md:col-span-2" : "col-span-1 flex flex-col"}
   >
-    <Link href={`/insight/${article.slug || article.id}`} className="contents group">
-      {/* Gambar Thumbnail - Menggunakan aspect ratio agar tidak gepeng di HP */}
-      <div className={`relative rounded-2xl overflow-hidden shrink-0 bg-slate-100 w-full ${isHeadline ? "md:col-span-1 lg:col-span-2 aspect-video md:aspect-auto md:h-[420px]" : "aspect-4/3 md:h-52"}`}>
+    <Link href={`/insight/${article.slug || article.id}`} className={`group ${isHeadline ? "grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-8" : "flex flex-col h-full"}`}>
+      {/* Gambar Thumbnail */}
+      <div className={`relative rounded-2xl overflow-hidden bg-slate-100 w-full ${isHeadline ? "md:col-span-3 aspect-video" : "aspect-[4/3]"}`}>
         <ImageFallback
-          src={article.thumbnail ? getImageUrl(article.thumbnail) : "/fallback.jpg"}
+          src={article.thumbnail ? getImageUrl(article.thumbnail) : "/Logo-1.png"}
           alt={article.title}
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -106,8 +106,8 @@ const ArticleCard = ({ article, isHeadline, language, t }) => (
       </div>
 
       {/* Konten Teks */}
-      <div className={`flex flex-col ${isHeadline ? "md:col-span-1 lg:col-span-1 justify-center" : "mt-4 md:mt-6"}`}>
-        <h3 className={`${playfair.className} font-bold text-blue-950 group-hover:text-blue-700 transition-colors leading-tight mb-3 md:mb-4 ${isHeadline ? "text-2xl md:text-3xl lg:text-4xl" : "text-lg md:text-xl"}`}>
+      <div className={`flex flex-col ${isHeadline ? "md:col-span-2 justify-center py-2" : "mt-4 md:mt-5 flex-1"}`}>
+        <h3 className={`${playfair.className} font-bold text-blue-950 group-hover:text-blue-700 transition-colors leading-tight mb-3 ${isHeadline ? "text-2xl md:text-3xl" : "text-lg md:text-xl"}`}>
           {article.title}
         </h3>
         <p className="text-gray-500 text-xs md:text-sm leading-relaxed line-clamp-3">
@@ -120,7 +120,7 @@ const ArticleCard = ({ article, isHeadline, language, t }) => (
           </span>
           <span className="flex items-center gap-1.5">
             <Clock size={12} className="text-yellow-600" />
-            {t("insight.read_time") || "5 MIN READ"}
+            {t("insight.read_time") || "5 MENIT"}
           </span>
         </div>
       </div>

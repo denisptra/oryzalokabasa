@@ -1,6 +1,6 @@
 // API Client Configuration
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://oryzalokabasa-mkce.vercel.app/api";
+  process.env.NEXT_PUBLIC_API_URL || "https://oryzalokabasa.com/api";
 
 // Helper to get auth token from sessionStorage
 const getToken = () => {
@@ -620,6 +620,6 @@ export const getImageUrl = (path) => {
   if (path.startsWith("http")) return path;
   const baseUrl =
     process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ||
-    "http://localhost:5000";
+    "https://oryzalokabasa.com";
   return `${baseUrl}${path}`;
 };
