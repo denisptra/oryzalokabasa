@@ -67,7 +67,7 @@ app.use((err, req, res, next) => {
     let message = "Terjadi kesalahan saat mengupload file.";
     switch (err.code) {
       case "LIMIT_FILE_SIZE":
-        message = "Ukuran file terlalu besar. Maksimal 10MB per file. Silakan kompres atau gunakan gambar dengan ukuran lebih kecil.";
+        message = "Ukuran file terlalu besar. Batas maksimal adalah 10MB (Gambar) atau 50MB (Video).";
         break;
       case "LIMIT_FILE_COUNT":
         message = "Jumlah file melebihi batas. Maksimal 1 file per upload.";

@@ -3,7 +3,7 @@ const router = express.Router();
 const videoController = require("../controllers/video.controller");
 const { authenticate } = require("../middleware/auth");
 const { authorize } = require("../middleware/role");
-const { uploadSetting, setUploadType } = require("../middleware/upload");
+const { uploadVideo, setUploadType } = require("../middleware/upload");
 
 // PUBLIC
 router.get("/homepage-video/active", videoController.getActiveVideo);
@@ -15,8 +15,8 @@ router.post(
     "/homepage-video/save", 
     authenticate, 
     authorize(["ADMIN", "SUPER_ADMIN"]), 
-    setUploadType("settings"), 
-    uploadSetting.single("videoFile"), 
+    setUploadType("videos"), 
+    uploadVideo.single("videoFile"), 
     videoController.saveVideo
 );
 

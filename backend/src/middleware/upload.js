@@ -123,8 +123,8 @@ const uploadTeam = multer({
     limits: { fileSize: MAX_IMAGE_SIZE },
 });
 
-const uploadSetting = multer({
-    storage: getStorage('settings'),
+const uploadVideo = multer({
+    storage: getStorage('videos'),
     fileFilter: mediaFilter,
     limits: { fileSize: MAX_VIDEO_SIZE },
 });
@@ -140,7 +140,7 @@ module.exports = {
     uploadHeroSlider,
     uploadPost,
     uploadTeam,
-    uploadSetting,
+    uploadVideo,
     setUploadType,
     uploadsDir,
 };
