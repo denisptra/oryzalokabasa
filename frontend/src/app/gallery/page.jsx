@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Loader, Image as ImageIcon, Calendar, Maximize2 } from "lucide-react";
+import { Search, X, Loader, Image as ImageIcon, Calendar, Maximize2, ChevronDown } from "lucide-react";
 import { galleryAPI, categoryAPI, getImageUrl } from "@/lib/api";
 import { Inter, Playfair_Display } from "next/font/google";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -163,6 +163,8 @@ const PreviewModal = ({ image, onClose, categoryName, formattedDate, t }) => {
 // MAIN COMPONENT
 // ==========================================
 
+const ITEMS_PER_LOAD = 6;
+
 export default function GaleriPage() {
   const { t } = useLanguage();
   const [gallery, setGallery] = useState([]);
@@ -171,6 +173,7 @@ export default function GaleriPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [previewImage, setPreviewImage] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_LOAD);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -196,6 +199,15 @@ export default function GaleriPage() {
     });
   }, [gallery, searchQuery, activeCategory]);
 
+  // Reset visible count when filter/search changes
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_LOAD);
+  }, [activeCategory, searchQuery]);
+
+  const visibleGallery = filteredGallery.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredGallery.length;
+  const remainingCount = filteredGallery.length - visibleCount;
+
   const getCategoryName = (catId) => categories.find((c) => c.id === catId)?.name || "";
   const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "";
 
@@ -209,20 +221,36 @@ export default function GaleriPage() {
         {loading ? (
           <div className="flex items-center justify-center py-20"><Loader className="animate-spin text-blue-500" size={40} /></div>
         ) : (
-          <motion.div initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            <AnimatePresence mode="popLayout">
-              {filteredGallery.map((item) => (
-                <GalleryCard 
-                  key={item.id} 
-                  item={item} 
-                  onClick={setPreviewImage} 
-                  categoryName={getCategoryName(item.categoryId)} 
-                  formattedDate={formatDate(item.eventDate || item.createdAt)} 
-                  t={t} 
-                />
-              ))}
-            </AnimatePresence>
-          </motion.div>
+          <>
+            <motion.div initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              <AnimatePresence mode="popLayout">
+                {visibleGallery.map((item) => (
+                  <GalleryCard 
+                    key={item.id} 
+                    item={item} 
+                    onClick={setPreviewImage} 
+                    categoryName={getCategoryName(item.categoryId)} 
+                    formattedDate={formatDate(item.eventDate || item.createdAt)} 
+                    t={t} 
+                  />
+                ))}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="flex justify-center mt-12">
+                <button
+                  onClick={() => setVisibleCount(prev => prev + ITEMS_PER_LOAD)}
+                  className="group flex items-center gap-3 px-8 py-3.5 bg-blue-950 text-white rounded-full font-bold text-sm hover:bg-blue-900 transition-all shadow-lg hover:shadow-xl hover:shadow-blue-950/20"
+                >
+                  <span>Lihat Lebih Banyak</span>
+                  <span className="bg-white/20 px-2.5 py-0.5 rounded-full text-xs">{remainingCount}</span>
+                  <ChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform" />
+                </button>
+              </div>
+            )}
+          </>
         )}
 
         {!loading && filteredGallery.length === 0 && (

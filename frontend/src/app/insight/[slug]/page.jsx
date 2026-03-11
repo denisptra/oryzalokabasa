@@ -177,9 +177,9 @@ export default async function DetailBerita({ params }) {
           )}
         </figure>
 
-        {/* PERBAIKAN: Lebar dibatasi (max-w-3xl mx-auto) agar jarak justify tidak "bolong", dan ditambah !whitespace-normal !break-words */}
+        {/* PERBAIKAN: max-w-2xl agar jarak justify tidak bolong, line-height & margin lebih rapat */}
         <article
-          className="ql-editor prose prose-slate max-w-3xl mx-auto w-full text-justify prose-p:text-justify [&_*]:!whitespace-normal [&_*]:!break-words prose-a:break-all prose-p:text-gray-600 prose-p:leading-[1.9] prose-p:mb-6 prose-headings:text-blue-950 prose-img:rounded-2xl prose-img:mx-auto prose-a:text-yellow-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-blue-950 prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:overflow-x-auto"
+          className="ql-editor prose prose-slate max-w-2xl mx-auto w-full text-justify prose-p:text-justify [&_*]:!whitespace-normal [&_*]:!break-words [&_*]:!overflow-wrap-anywhere prose-a:break-all prose-p:text-gray-600 prose-p:leading-[1.8] prose-p:mb-4 prose-headings:text-blue-950 prose-headings:mb-3 prose-headings:mt-8 prose-img:rounded-2xl prose-img:mx-auto prose-a:text-yellow-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-blue-950 prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:overflow-x-auto prose-li:text-gray-600 prose-li:leading-[1.8] prose-blockquote:border-blue-200 prose-blockquote:text-gray-500"
         >
           {parse(cleanHtml)}
         </article>

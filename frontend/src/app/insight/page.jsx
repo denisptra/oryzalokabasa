@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Calendar, Clock, Loader, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Calendar, Clock, Loader, ChevronDown } from "lucide-react";
 import { postAPI, categoryAPI, getImageUrl } from "@/lib/api";
 import { Inter, Playfair_Display } from "next/font/google";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -25,24 +25,24 @@ const stripHtml = (html) => html?.replace(/<[^>]*>?/gm, "").replace(/&nbsp;/g, "
 
 // 1. HEADER (Sesuai Gambar Referensi)
 const PageHeader = () => (
-  <header className="py-16 md:py-20 px-6 text-center border-b border-gray-100 bg-[#FAFAFA]">
-    <motion.div initial="hidden" animate="visible" variants={slowFadeUp} className="max-w-full mx-auto flex flex-col items-center">
-      {/* Garis dan Tag Wawasan */}
-      <div className="flex items-center justify-center gap-4 mb-4 md:mb-6">
-        <div className="w-max md:w-16 h-px bg-gray-300"></div>
-        <span className="text-blue-950 font-bold text-[10px] md:text-xs tracking-[0.15em] uppercase">
+  <header className="py-20 px-6 text-center border-b border-gray-50 bg-[#FAFAFA]">
+    <motion.div initial="hidden" animate="visible" variants={slowFadeUp} className="max-w-3xl mx-auto">
+      {/* Garis dan Tag Wawasan - Serupa dengan Gallery */}
+      <div className="flex items-center justify-center gap-4 mb-4">
+        <div className="h-[1px] w-full md:w-12 bg-gray-300"></div>
+        <p className="text-blue-900 font-bold text-[10px] md:text-xs tracking-[0.15em] uppercase">
           Wawasan & Literasi
-        </span>
-        <div className="w-10 md:w-16 h-px bg-gray-300"></div>
+        </p>
+        <div className="h-[1px] w-full md:w-12 bg-gray-300"></div>
       </div>
 
-      {/* Judul Utama - Dioptimasi untuk Mobile & Desktop */}
-      <h1 className={`${playfair.className} text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-blue-950 mb-4 md:mb-6 leading-tight`}>
+      {/* Judul Utama */}
+      <h1 className={`${playfair.className} text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-blue-950 mb-6 leading-tight`}>
         Arsip Wawasan & Literasi Budaya
       </h1>
 
       {/* Subjudul */}
-      <p className="text-gray-500 text-sm md:text-base leading-relaxed px-4">
+      <p className="text-gray-500 max-w-full mx-auto leading-relaxed text-sm md:text-base px-4">
         Catatan, refleksi, dan dokumentasi kegiatan seni dan budaya Oryza Lokabasa sebagai ruang belajar dan dialog publik.
       </p>
     </motion.div>
@@ -132,6 +132,8 @@ const ArticleCard = ({ article, isHeadline, language, t }) => (
 // MAIN COMPONENT
 // ==========================================
 
+const ITEMS_PER_LOAD = 6;
+
 export default function WawasanPage() {
   const { t, language } = useLanguage();
   const [articles, setArticles] = useState([]);
@@ -139,9 +141,7 @@ export default function WawasanPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const ITEMS_PER_PAGE = 10;
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_LOAD);
 
   const toggleFilter = (catId) => {
     if (catId === "RESET") {
@@ -149,20 +149,18 @@ export default function WawasanPage() {
     } else {
       setActiveFilters((prev) => prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]);
     }
-    setCurrentPage(1);
+    setVisibleCount(ITEMS_PER_LOAD);
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      // setLoading(true);
       try {
-        const params = new URLSearchParams({ page: currentPage, limit: ITEMS_PER_PAGE, status: "PUBLISHED" });
+        const params = new URLSearchParams({ page: 1, limit: 100, status: "PUBLISHED" });
         if (activeFilters.length > 0) params.append("categoryId", activeFilters.join(","));
         if (searchQuery) params.append("search", searchQuery);
 
         const [postsRes, catRes] = await Promise.all([postAPI.getAll(params.toString()), categoryAPI.getAll()]);
         setArticles(postsRes.data || []);
-        setTotalPages(postsRes.pagination?.pages || 1);
         setCategories(catRes.data || []);
       } catch (err) {
         console.error("Fetch error:", err);
@@ -173,7 +171,16 @@ export default function WawasanPage() {
 
     const debounce = setTimeout(fetchData, 400);
     return () => clearTimeout(debounce);
-  }, [currentPage, activeFilters, searchQuery]);
+  }, [activeFilters, searchQuery]);
+
+  // Reset visible count when search/filter changes
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_LOAD);
+  }, [activeFilters, searchQuery]);
+
+  const visibleArticles = articles.slice(0, visibleCount);
+  const hasMore = visibleCount < articles.length;
+  const remainingCount = articles.length - visibleCount;
 
   return (
     <main className={`${inter.className} bg-white min-h-screen pb-20`}>
@@ -193,7 +200,7 @@ export default function WawasanPage() {
                   placeholder={t("insight.search_placeholder") || "Cari artikel..."}
                   className="w-full py-2 pr-10 outline-none bg-transparent text-sm md:text-base"
                   value={searchQuery}
-                  onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                  onChange={(e) => { setSearchQuery(e.target.value); setVisibleCount(ITEMS_PER_LOAD); }}
                 />
                 <Search size={18} className="absolute right-0 top-2.5 text-gray-400" />
               </div>
@@ -206,34 +213,33 @@ export default function WawasanPage() {
             {loading ? (
               <div className="flex justify-center py-20"><Loader className="animate-spin text-blue-500" size={32} /></div>
             ) : articles.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 md:gap-y-12">
-                <AnimatePresence mode="popLayout">
-                  {articles.map((article, idx) => {
-                    const isHeadline = idx === 0 && currentPage === 1 && !searchQuery && activeFilters.length === 0;
-                    return <ArticleCard key={article.id} article={article} isHeadline={isHeadline} language={language} t={t} />;
-                  })}
-                </AnimatePresence>
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 md:gap-y-12">
+                  <AnimatePresence mode="popLayout">
+                    {visibleArticles.map((article, idx) => {
+                      const isHeadline = idx === 0 && visibleCount === ITEMS_PER_LOAD && !searchQuery && activeFilters.length === 0;
+                      return <ArticleCard key={article.id} article={article} isHeadline={isHeadline} language={language} t={t} />;
+                    })}
+                  </AnimatePresence>
+                </div>
+
+                {/* Load More Button */}
+                {hasMore && (
+                  <div className="flex justify-center mt-12">
+                    <button
+                      onClick={() => setVisibleCount(prev => prev + ITEMS_PER_LOAD)}
+                      className="group flex items-center gap-3 px-8 py-3.5 bg-blue-950 text-white rounded-full font-bold text-sm hover:bg-blue-900 transition-all shadow-lg hover:shadow-xl hover:shadow-blue-950/20"
+                    >
+                      <span>Lihat Lebih Banyak</span>
+                      <span className="bg-white/20 px-2.5 py-0.5 rounded-full text-xs">{remainingCount}</span>
+                      <ChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform" />
+                    </button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-center py-20">
                 <p className="text-gray-400 italic text-sm md:text-base">{t("insight.empty") || "Belum ada artikel yang dipublikasikan."}</p>
-              </div>
-            )}
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-1 md:gap-2 mt-16">
-                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-1 md:p-2 text-gray-400 disabled:opacity-20 transition-all hover:text-blue-900"><ChevronLeft size={20} /></button>
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl font-bold text-xs md:text-sm transition-all ${currentPage === i + 1 ? "bg-blue-950 text-white shadow-md" : "text-gray-400 hover:bg-gray-100"}`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-1 md:p-2 text-gray-400 disabled:opacity-20 transition-all hover:text-blue-900"><ChevronRight size={20} /></button>
               </div>
             )}
           </div>

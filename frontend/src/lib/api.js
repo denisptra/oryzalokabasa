@@ -54,6 +54,22 @@ const fetchData = async (url, options, endpoint, isGet) => {
     headers,
   });
 
+  // Check if the response is JSON before parsing
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    // Server returned non-JSON (e.g. Nginx HTML error page)
+    if (response.status === 413) {
+      throw new Error("Ukuran file terlalu besar. Server menolak upload. Silakan kompres gambar (maksimal 5MB) dan coba lagi.");
+    }
+    if (response.status === 502 || response.status === 504) {
+      throw new Error("Server sedang tidak tersedia. Silakan coba lagi nanti.");
+    }
+    if (response.status === 404) {
+      throw new Error(`Endpoint API tidak ditemukan: ${endpoint}`);
+    }
+    throw new Error(`Server mengembalikan respons yang tidak valid (HTTP ${response.status}). Periksa koneksi atau coba lagi nanti.`);
+  }
+
   const data = await response.json();
 
   if (!response.ok) {
