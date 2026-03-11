@@ -40,13 +40,34 @@ export async function generateMetadata({ params }) {
   if (!article) return { title: "Artikel Tidak Ditemukan" };
 
   const title = article.metaTitle || article.title;
-  const description = article.metaDescription || article.excerpt?.replace(/<[^>]+>/g, "");
-  const image = article.thumbnail ? (article.thumbnail.startsWith("http") ? article.thumbnail : getImageUrl(article.thumbnail)) : "/fallback.jpg";
+  const rawDesc = article.metaDescription || article.excerpt || article.content?.substring(0, 160);
+  const description = rawDesc?.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").trim();
+  const image = article.thumbnail ? (article.thumbnail.startsWith("http") ? article.thumbnail : getImageUrl(article.thumbnail)) : "/og-image.jpg";
 
   return {
     title: `${title} | Oryza Lokabasa`,
     description,
-    openGraph: { title, description, images: [image], type: "article" },
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+      type: "article",
+      siteName: "Oryza Lokabasa",
+      url: `https://oryzalokabasa.com/insight/${article.slug || article.id}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
   };
 }
 
@@ -103,7 +124,7 @@ const TrendingSection = ({ posts }) => {
                 loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-black text-yellow-700 uppercase tracking-widest shadow-sm">
+              <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-full text-[9px] font-black text-yellow-700 uppercase tracking-widest shadow-sm">
                 {post.category?.name || "Artikel"}
               </div>
             </div>
@@ -190,7 +211,7 @@ export default async function DetailBerita({ params }) {
 
           <div className="flex flex-wrap gap-2">
             {(tags.length > 0 ? tags : [article.category?.name, "Wawasan"]).filter(Boolean).map((tag, idx) => (
-              <span key={idx} className="px-3 py-1.5 bg-slate-50 text-slate-500 text-[10px] font-bold rounded-md uppercase tracking-widest border border-slate-100 shrink-0 hover:bg-slate-100 transition-colors">
+              <span key={idx} className="px-3 py-1.5 bg-slate-50 text-slate-500 text-[10px] font-bold rounded-full uppercase tracking-widest border border-slate-100 shrink-0 hover:bg-slate-100 transition-colors">
                 # {tag}
               </span>
             ))}

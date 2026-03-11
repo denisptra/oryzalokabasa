@@ -98,7 +98,7 @@ const ArticleCard = ({ article, isHeadline, language, t }) => (
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         />
-        <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded shadow-sm">
+        <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
           <span className="text-[9px] md:text-[10px] font-bold text-yellow-700 italic uppercase">
             {article.category?.name || "Artikel"}
           </span>

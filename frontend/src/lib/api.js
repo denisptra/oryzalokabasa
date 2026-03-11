@@ -59,7 +59,7 @@ const fetchData = async (url, options, endpoint, isGet) => {
   if (!contentType.includes("application/json")) {
     // Server returned non-JSON (e.g. Nginx HTML error page)
     if (response.status === 413) {
-      throw new Error("Ukuran file terlalu besar. Server menolak upload. Silakan kompres gambar (maksimal 5MB) dan coba lagi.");
+      throw new Error("Ukuran file terlalu besar. Batas maksimal adalah 10MB (Gambar) atau 50MB (Video). Silakan coba lagi dengan file yang lebih kecil.");
     }
     if (response.status === 502 || response.status === 504) {
       throw new Error("Server sedang tidak tersedia. Silakan coba lagi nanti.");
