@@ -74,18 +74,18 @@ export default function HeroSlider() {
             <div className="absolute inset-0 bg-black/70 z-10" />
 
             {/* Konten Text */}
-            <div className="relative z-20 max-w-4xl">
-                <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 ${playfair.className}`}>
+            <div className="relative z-20 max-w-4xl px-4">
+                <h1 className={`text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 ${playfair.className} leading-tight`}>
                     {slide.title} <span className="text-oryza-gold">{slide.highlight}</span>
                 </h1>
 
-                <p className={`${inter.className} text-gray-200 mb-8 max-w-2xl mx-auto`}>
+                <p className={`${inter.className} text-gray-200 text-sm md:text-base lg:text-lg mb-8 max-w-2xl mx-auto px-2`}>
                     {slide.subtitle || slide.description}
                 </p>
 
                 <Link
                     href={slide.link || "#"}
-                    className={`${inter.className} px-8 py-3 border border-white text-white rounded-full hover:bg-white hover:text-black transition inline-block font-medium`}
+                    className={`${inter.className} px-6 py-2.5 md:px-8 md:py-3 border border-white text-white rounded-full hover:bg-white hover:text-black transition inline-block text-sm md:text-base font-medium uppercase tracking-widest`}
                 >
                     {t("hero.explore") || "Explore"}
                 </Link>
@@ -96,16 +96,16 @@ export default function HeroSlider() {
                 <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-6 z-30 pointer-events-none">
                     <button
                         onClick={() => changeSlide(-1)}
-                        className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm border border-white/20 hover:bg-white/30 hover:scale-110 active:scale-95 transition-all pointer-events-auto"
+                        className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm border border-white/20 hover:bg-white/30 hover:scale-110 active:scale-95 transition-all pointer-events-auto"
                     >
-                        <ChevronLeft size={32} strokeWidth={1.5} />
+                        <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" strokeWidth={1.5} />
                     </button>
 
                     <button
                         onClick={() => changeSlide(1)}
-                        className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm border border-white/20 hover:bg-white/30 hover:scale-110 active:scale-95 transition-all pointer-events-auto"
+                        className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm border border-white/20 hover:bg-white/30 hover:scale-110 active:scale-95 transition-all pointer-events-auto"
                     >
-                        <ChevronRight size={32} strokeWidth={1.5} />
+                        <ChevronRight className="w-6 h-6 md:w-8 md:h-8" strokeWidth={1.5} />
                     </button>
                 </div>
             )}

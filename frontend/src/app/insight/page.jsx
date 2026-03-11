@@ -118,10 +118,6 @@ const ArticleCard = ({ article, isHeadline, language, t }) => (
             <Calendar size={12} className="text-yellow-600" />
             {new Date(article.createdAt).toLocaleDateString(language === "EN" ? "en-US" : "id-ID", { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase()}
           </span>
-          <span className="flex items-center gap-1.5">
-            <Clock size={12} className="text-yellow-600" />
-            {t("insight.read_time") || "5 MENIT"}
-          </span>
         </div>
       </div>
     </Link>

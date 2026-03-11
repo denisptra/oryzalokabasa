@@ -18,8 +18,9 @@ import {
     ChevronLeft,
     ChevronRight,
     Shield,
-    Menu,
     X,
+    Video,
+    Menu,
 } from "lucide-react";
 import { diagnostikAPI } from "@/lib/api";
 
@@ -61,6 +62,12 @@ const menuItems = [
         roles: ["ADMIN", "SUPER_ADMIN"],
     },
     {
+        label: "Video Beranda",
+        href: "/panel-admin/video",
+        icon: Video,
+        roles: ["ADMIN", "SUPER_ADMIN"],
+    },
+    {
         label: "Anggota (Tim)",
         href: "/panel-admin/team",
         icon: Users,
@@ -71,12 +78,6 @@ const menuItems = [
         href: "/panel-admin/contacts",
         icon: MessageSquare,
         roles: ["ADMIN", "SUPER_ADMIN"],
-    },
-    {
-        label: "Pengaturan",
-        href: "/panel-admin/settings",
-        icon: Settings,
-        roles: ["SUPER_ADMIN"],
     },
     {
         label: "Log Aktivitas",

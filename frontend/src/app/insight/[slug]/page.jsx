@@ -78,7 +78,6 @@ const ArticleMeta = ({ author, createdAt, title }) => (
         <p className="text-xs font-black uppercase text-blue-950">{author?.name || "Redaksi Oryza"}</p>
         <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">
           <span className="flex items-center gap-1.5"><Calendar size={12} /> {new Date(createdAt).toLocaleDateString("id-ID")}</span>
-          <span className="flex items-center gap-1.5"><Clock size={12} /> 5 Min Read</span>
         </div>
       </div>
     </div>

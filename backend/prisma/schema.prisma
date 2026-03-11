@@ -146,10 +146,13 @@ model Log {
   createdAt DateTime @default(now())
 }
 
-// --- GLOBAL SETTINGS ---
+// --- HOMEPAGE VIDEO ---
 
-model Setting {
-  id    String @id @default(uuid())
-  key   String @unique
-  value String @db.Text
+model HomepageVideo {
+  id        String   @id @default(uuid())
+  title     String?
+  url       String   @db.Text
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

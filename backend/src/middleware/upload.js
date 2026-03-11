@@ -58,6 +58,7 @@ const getCloudinaryStorage = (folderName) => {
         cloudinary: cloudinary,
         params: {
             folder: `oryzalokabasa/${folderName}`,
+            resource_type: "auto", // Penting: agar bisa upload video
             transformation: [{ width: 1200, crop: "limit", quality: "auto", fetch_format: "auto" }],
         },
     });
@@ -68,53 +69,64 @@ const getStorage = (folder) => {
     return useCloudinary ? getCloudinaryStorage(folder) : localStorage;
 };
 
-// File filter - only images
-const imageFilter = (req, file, cb) => {
+// File filter - images and videos
+const mediaFilter = (req, file, cb) => {
     const allowedTypes = [
         "image/jpeg",
         "image/png",
         "image/gif",
         "image/webp",
         "image/svg+xml",
+        "video/mp4",
+        "video/webm",
+        "video/quicktime", // .mov
+        "video/ogg",
     ];
     if (allowedTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
         cb(
             new Error(
-                "Format file tidak didukung. Gunakan JPEG, PNG, GIF, WebP, atau SVG."
+                "Format file tidak didukung. Gunakan Gambar atau Video (MP4/WebM/MOV/OGG)."
             ),
             false
         );
     }
 };
 
-// Max file size: 10MB for all uploads
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+// Max file size
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
 
 // Multer instances
 const uploadGallery = multer({
     storage: getStorage('gallery'),
-    fileFilter: imageFilter,
-    limits: { fileSize: MAX_FILE_SIZE },
+    fileFilter: mediaFilter,
+    limits: { fileSize: MAX_IMAGE_SIZE },
 });
 
 const uploadHeroSlider = multer({
     storage: getStorage('hero-slider'),
-    fileFilter: imageFilter,
-    limits: { fileSize: MAX_FILE_SIZE },
+    fileFilter: mediaFilter,
+    limits: { fileSize: MAX_IMAGE_SIZE },
 });
 
 const uploadPost = multer({
     storage: getStorage('posts'),
-    fileFilter: imageFilter,
-    limits: { fileSize: MAX_FILE_SIZE },
+    fileFilter: mediaFilter,
+    limits: { fileSize: MAX_IMAGE_SIZE },
 });
 
 const uploadTeam = multer({
     storage: getStorage('team'),
-    fileFilter: imageFilter,
-    limits: { fileSize: MAX_FILE_SIZE },
+    fileFilter: mediaFilter,
+    limits: { fileSize: MAX_IMAGE_SIZE },
+});
+
+const uploadSetting = multer({
+    storage: getStorage('settings'),
+    fileFilter: mediaFilter,
+    limits: { fileSize: MAX_VIDEO_SIZE },
 });
 
 // Middleware to set upload type
@@ -128,6 +140,7 @@ module.exports = {
     uploadHeroSlider,
     uploadPost,
     uploadTeam,
+    uploadSetting,
     setUploadType,
     uploadsDir,
 };

@@ -70,49 +70,77 @@ const TimelineSection = ({ t }) => {
   );
 };
 
-const TeamSection = ({ t, teamData }) => (
-  <section className="py-24 px-6 max-w-7xl mx-auto text-center">
-    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={slowFadeUp}>
-      <h2 className={`${playfair.className} text-4xl font-bold text-blue-950 mb-4`}>{t("about.founders_title")}</h2>
-      <p className="text-gray-500 max-w-2xl mx-auto mb-16">{t("about.founders_desc")}</p>
-    </motion.div>
+const TeamSection = ({ t, teamData }) => {
+  // Ensure we show at least 5 people as requested by the user. 
+  // If the data from API is empty or less than 5, we fill it with placeholders to show the layout.
+  const displayTeam = teamData && teamData.length >= 5 
+    ? teamData.slice(0, 5) 
+    : [
+        ...(teamData || []),
+        ...Array(Math.max(0, 5 - (teamData ? teamData.length : 0))).fill({ name: "", role: "", image: null })
+      ].slice(0, 5);
 
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-      {teamData.map((person, idx) => (
-        <motion.div
-          key={idx}
-          // Animasi kemunculan (dipercepat durasinya, delay dipersingkat)
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: idx * 0.1 }}
-          viewport={{ once: true }}
-          // Hover menggunakan Tailwind (duration-200) agar sangat responsif dan cepat
-          className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 transition-all duration-200 hover:-translate-y-2 hover:shadow-lg hover:border-blue-100 group cursor-default"
-        >
-          <div className="w-24 h-24 bg-slate-50 rounded-full mx-auto mb-6 flex items-center justify-center overflow-hidden border-4 border-slate-100 shadow-inner group-hover:border-blue-200 transition-colors duration-200">
-            {person.image ? (
-              <img
-                src={getImageUrl(person.image)}
-                alt={person.name}
-                className="w-full h-full object-cover"
-                loading="lazy"
-                onError={(e) => { e.target.onerror = null; e.target.src = "/Logo-1.png"; }}
-              />
-            ) : (
-              <div className="w-12 h-12 bg-slate-200 rounded-full" />
-            )}
-          </div>
-          <h4 className={`${playfair.className} font-bold text-blue-950 text-base md:text-lg leading-tight group-hover:text-blue-700 transition-colors`}>
-            {person.name}
-          </h4>
-          <span className="text-yellow-600 text-xs font-bold uppercase mt-2 block tracking-widest">
-            {person.role}
-          </span>
-        </motion.div>
-      ))}
-    </div>
-  </section>
-);
+  return (
+    <section className="py-24 px-6 max-w-7xl mx-auto text-center">
+      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={slowFadeUp}>
+        <span className="text-yellow-600 font-bold uppercase text-[10px] tracking-[0.4em] mb-4 block opacity-70">
+          Our Visionaries
+        </span>
+        <h2 className={`${playfair.className} text-4xl md:text-5xl font-bold text-blue-950 mb-6 tracking-tight`}>
+          {t("about.founders_title")}
+        </h2>
+        <p className="text-gray-500 max-w-2xl mx-auto mb-20 text-lg leading-relaxed">
+          {t("about.founders_desc")}
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+        {displayTeam.map((person, idx) => (
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+            viewport={{ once: true }}
+            className="group"
+          >
+            {/* Main Card */}
+            <div className="relative aspect-4/5 w-full bg-slate-50 rounded-4xl overflow-hidden border-4 border-white shadow-xl transition-all duration-500 group-hover:shadow-2xl group-hover:scale-[1.03] group-hover:-rotate-1">
+              {person.image ? (
+                <img
+                  src={getImageUrl(person.image)}
+                  alt={person.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  loading="lazy"
+                  onError={(e) => { e.target.onerror = null; e.target.src = "/Logo-1.png"; }}
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-slate-50 to-slate-200 p-8">
+                  <img src="/Logo-1.png" alt="Placeholder" className="w-16 h-16 opacity-10 grayscale mb-4" />
+                  <div className="w-8 h-1 bg-blue-900/5 rounded-full" />
+                </div>
+              )}
+              
+              {/* Subtle Gradient Overlay */}
+              <div className="absolute inset-0 bg-linear-to-t from-blue-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </div>
+
+            {/* Info Section */}
+            <div className="mt-8 transition-all duration-500 transform group-hover:-translate-y-2">
+              <h4 className={`${playfair.className} font-bold text-blue-950 text-xl md:text-2xl leading-tight group-hover:text-blue-700 transition-colors duration-300`}>
+                {person.name || "Member Name"}
+              </h4>
+              <div className="w-6 h-0.5 bg-yellow-500 mx-auto my-3 opacity-30 group-hover:w-10 group-hover:opacity-100 transition-all duration-500" />
+              <span className="text-yellow-600 text-[10px] font-black uppercase tracking-[0.25em]">
+                {person.role || "Board Member"}
+              </span>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+};
 
 // ==========================================
 // MAIN COMPONENT

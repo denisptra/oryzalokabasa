@@ -221,7 +221,7 @@ const translations = {
             quick_links: "Links",
             program: "Program",
             contact: "Contact Us",
-            rights: "© 2024 Oryza Lokabasa. All Rights Reserved.",
+            rights: "© 2026 Oryza Lokabasa. All Rights Reserved.",
         }
     }
 };

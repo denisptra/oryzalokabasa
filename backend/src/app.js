@@ -10,11 +10,11 @@ const postRoutes = require("./routes/post.routes");
 const contactRoutes = require("./routes/contact.routes");
 const galleryRoutes = require("./routes/gallery.routes");
 const heroSliderRoutes = require("./routes/hero-slider.routes");
-const settingsRoutes = require("./routes/settings.routes");
 const logRoutes = require("./routes/log.routes");
 const analyticsRoutes = require("./routes/analytics.routes");
 const diagnostikRoutes = require("./routes/diagnostik.routes");
 const teamRoutes = require("./routes/team.routes");
+const videoRoutes = require("./routes/video.routes");
 
 const app = express();
 
@@ -37,11 +37,11 @@ app.use("/api", postRoutes); // Post/Article CRUD (ADMIN & SUPER_ADMIN)
 app.use("/api/contact", contactRoutes); // Contact messages (PUBLIC send, ADMIN+ manage)
 app.use("/api", galleryRoutes); // Gallery/Photos CRUD (PUBLIC list, ADMIN+ manage)
 app.use("/api", heroSliderRoutes); // Hero Slider CRUD (PUBLIC list, ADMIN+ manage)
-app.use("/api", settingsRoutes); // Settings config (PUBLIC read, SUPER_ADMIN manage)
 app.use("/api", logRoutes); // Audit logs (SUPER_ADMIN only)
 app.use("/api/analytics", analyticsRoutes); // Analytics & page views tracking
 app.use("/api/diagnostik", diagnostikRoutes); // System diagnostik
 app.use("/api", teamRoutes); // Team Members CRUD
+app.use("/api", videoRoutes); // Homepage Video CRUD
 
 app.get("/", (req, res) => {
   res.json({

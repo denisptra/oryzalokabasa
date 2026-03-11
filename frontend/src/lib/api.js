@@ -513,47 +513,6 @@ export const teamAPI = {
   },
 };
 
-// ===================== SETTINGS API =====================
-export const settingsAPI = {
-  getByKey: async (key) => {
-    return apiFetch(`/setting/key/${key}`);
-  },
-
-  getBatch: async (keys) => {
-    return apiFetch("/setting/batch", {
-      method: "POST",
-      body: JSON.stringify({ keys }),
-    });
-  },
-
-  getSummary: async () => {
-    return apiFetch("/setting/summary");
-  },
-
-  getAll: async () => {
-    return apiFetch("/setting/");
-  },
-
-  save: async (data) => {
-    return apiFetch("/setting/save", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  },
-
-  delete: async (key) => {
-    return apiFetch(`/setting/delete/${key}`, {
-      method: "DELETE",
-    });
-  },
-
-  reset: async () => {
-    return apiFetch("/setting/reset", {
-      method: "DELETE",
-    });
-  },
-};
-
 // ===================== LOG API (SUPER_ADMIN only) =====================
 export const logAPI = {
   getAll: async (params = "") => {
@@ -614,6 +573,45 @@ export const analyticsAPI = {
   // Clear all views for a post (ADMIN+)
   clearPostViews: async (postId) => {
     return apiFetch(`/analytics/post/${postId}/views`, {
+      method: "DELETE",
+    });
+  },
+};
+
+// ===================== VIDEO API =====================
+export const videoAPI = {
+  getActive: async () => {
+    return apiFetch("/homepage-video/active");
+  },
+
+  getAll: async () => {
+    return apiFetch("/homepage-video/");
+  },
+
+  save: async (data) => {
+    // If it's FormData (for file upload), just pass it
+    if (data instanceof FormData) {
+      return apiFetch("/homepage-video/save", {
+        method: "POST",
+        body: data,
+      });
+    }
+    
+    // Otherwise it's regular JSON (for title/status updates)
+    return apiFetch("/homepage-video/save", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  toggle: async (id) => {
+    return apiFetch(`/homepage-video/toggle/${id}`, {
+      method: "PUT",
+    });
+  },
+
+  delete: async (id) => {
+    return apiFetch(`/homepage-video/delete/${id}`, {
       method: "DELETE",
     });
   },
