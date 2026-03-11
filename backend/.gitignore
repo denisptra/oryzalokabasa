@@ -1,10 +1,21 @@
-node_modules
+# ============================================
+# BACKEND .GITIGNORE
+# ============================================
+
+# Dependencies
+node_modules/
+
+# Environment variables
 .env
 .env.*
-.DS_Store
+!.env.example
 
-# Express/Node
-logs
+# OS files
+.DS_Store
+Thumbs.db
+
+# Express/Node logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -21,5 +32,22 @@ build/
 .tmp/
 tmpclaude-*
 
-# Local uploads
+# Local uploads (stored in cloud for production)
 uploads/
+
+# Backup & test files (not needed for deploy)
+backup.sql
+*.sql
+*.bak
+package.json.bak
+
+# Data dump files  
+posts.json
+tmp_*.json
+
+# Test scripts
+test-db.js
+test-*.js
+
+# Vercel
+.vercel/

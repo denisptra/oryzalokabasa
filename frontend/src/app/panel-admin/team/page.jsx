@@ -76,17 +76,44 @@ export default function TeamDashboardPage() {
         setShowModal(true);
     };
 
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
     const handleImageChange = (e) => {
         const file = e.target.files?.[0];
-        if (file) {
-            setImageFile(file);
-            setImagePreview(URL.createObjectURL(file));
+        if (!file) return;
+
+        // Validate file size
+        if (file.size > MAX_FILE_SIZE) {
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            setError(`Ukuran file terlalu besar (${sizeMB}MB). Maksimal 10MB per file. Silakan kompres gambar terlebih dahulu.`);
+            e.target.value = "";
+            return;
         }
+
+        // Validate file type
+        const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
+        if (!allowedTypes.includes(file.type)) {
+            setError("Format file tidak didukung. Gunakan JPEG, PNG, GIF, WebP, atau SVG.");
+            e.target.value = "";
+            return;
+        }
+
+        setError("");
+        setImageFile(file);
+        setImagePreview(URL.createObjectURL(file));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // setSaving(true);
+
+        // Double-check file size before submitting
+        if (imageFile && imageFile.size > MAX_FILE_SIZE) {
+            const sizeMB = (imageFile.size / (1024 * 1024)).toFixed(1);
+            setError(`Ukuran file terlalu besar (${sizeMB}MB). Maksimal 10MB per file.`);
+            return;
+        }
+
+        setSaving(true);
         setError("");
         try {
             const data = { ...formData };
@@ -103,7 +130,16 @@ export default function TeamDashboardPage() {
             fetchMembers();
             setTimeout(() => setSuccess(""), 3000);
         } catch (err) {
-            setError(err.message);
+            // Parse and display more helpful error messages
+            let errorMsg = err.message;
+            if (errorMsg.includes("LIMIT_FILE_SIZE") || errorMsg.includes("terlalu besar")) {
+                errorMsg = "Ukuran file terlalu besar. Maksimal 10MB per file. Silakan kompres gambar terlebih dahulu.";
+            } else if (errorMsg.includes("Format file") || errorMsg.includes("file type")) {
+                errorMsg = "Format file tidak didukung. Gunakan JPEG, PNG, GIF, WebP, atau SVG.";
+            } else if (errorMsg.includes("network") || errorMsg.includes("fetch")) {
+                errorMsg = "Gagal terhubung ke server. Periksa koneksi internet Anda dan coba lagi.";
+            }
+            setError(errorMsg);
         } finally {
             setSaving(false);
         }
@@ -283,7 +319,7 @@ export default function TeamDashboardPage() {
                                     </div>
                                     <div className="flex-1">
                                         <input type="file" accept="image/*" onChange={handleImageChange} className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 cursor-pointer" />
-                                        <p className="text-xs text-slate-400 mt-1">Gunakan foto rasio 1:1, max 5MB</p>
+                                        <p className="text-xs text-slate-400 mt-1">Gunakan foto rasio 1:1, maks 10MB</p>
                                     </div>
                                 </div>
                             </div>

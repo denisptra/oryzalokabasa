@@ -59,8 +59,53 @@ app.use((req, res) => {
   });
 });
 
-// Error Handler
+// Error Handler - Multer file upload errors
+const multer = require("multer");
 app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    // Multer-specific errors
+    let message = "Terjadi kesalahan saat mengupload file.";
+    switch (err.code) {
+      case "LIMIT_FILE_SIZE":
+        message = "Ukuran file terlalu besar. Maksimal 10MB per file. Silakan kompres atau gunakan gambar dengan ukuran lebih kecil.";
+        break;
+      case "LIMIT_FILE_COUNT":
+        message = "Jumlah file melebihi batas. Maksimal 1 file per upload.";
+        break;
+      case "LIMIT_UNEXPECTED_FILE":
+        message = "Field upload tidak sesuai. Pastikan nama field yang digunakan benar.";
+        break;
+      case "LIMIT_PART_COUNT":
+        message = "Terlalu banyak bagian dalam form upload.";
+        break;
+      case "LIMIT_FIELD_KEY":
+        message = "Nama field terlalu panjang.";
+        break;
+      case "LIMIT_FIELD_VALUE":
+        message = "Nilai field terlalu panjang.";
+        break;
+      case "LIMIT_FIELD_COUNT":
+        message = "Terlalu banyak field dalam form.";
+        break;
+      default:
+        message = `Error upload: ${err.message}`;
+    }
+    return res.status(400).json({
+      status: "error",
+      code: err.code,
+      message,
+    });
+  }
+
+  // Custom file filter errors (e.g., unsupported format)
+  if (err.message && err.message.includes("Format file tidak didukung")) {
+    return res.status(400).json({
+      status: "error",
+      code: "INVALID_FILE_TYPE",
+      message: err.message,
+    });
+  }
+
   if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
     return res.status(400).json({
       status: "error",

@@ -89,29 +89,32 @@ const imageFilter = (req, file, cb) => {
     }
 };
 
+// Max file size: 10MB for all uploads
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 // Multer instances
 const uploadGallery = multer({
     storage: getStorage('gallery'),
     fileFilter: imageFilter,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    limits: { fileSize: MAX_FILE_SIZE },
 });
 
 const uploadHeroSlider = multer({
     storage: getStorage('hero-slider'),
     fileFilter: imageFilter,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+    limits: { fileSize: MAX_FILE_SIZE },
 });
 
 const uploadPost = multer({
     storage: getStorage('posts'),
     fileFilter: imageFilter,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    limits: { fileSize: MAX_FILE_SIZE },
 });
 
 const uploadTeam = multer({
     storage: getStorage('team'),
     fileFilter: imageFilter,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    limits: { fileSize: MAX_FILE_SIZE },
 });
 
 // Middleware to set upload type

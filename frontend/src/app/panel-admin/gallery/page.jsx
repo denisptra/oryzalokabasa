@@ -116,12 +116,31 @@ export default function GalleryDashboardPage() {
         setShowModal(true);
     };
 
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
     const handleImageChange = (e) => {
         const file = e.target.files?.[0];
-        if (file) {
-            setImageFile(file);
-            setImagePreview(URL.createObjectURL(file));
+        if (!file) return;
+
+        // Validate file size
+        if (file.size > MAX_FILE_SIZE) {
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            setError(`Ukuran file terlalu besar (${sizeMB}MB). Maksimal 10MB per file. Silakan kompres gambar terlebih dahulu.`);
+            e.target.value = "";
+            return;
         }
+
+        // Validate file type
+        const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
+        if (!allowedTypes.includes(file.type)) {
+            setError("Format file tidak didukung. Gunakan JPEG, PNG, GIF, WebP, atau SVG.");
+            e.target.value = "";
+            return;
+        }
+
+        setError("");
+        setImageFile(file);
+        setImagePreview(URL.createObjectURL(file));
     };
 
     const handleSubmit = async (e) => {
@@ -130,7 +149,15 @@ export default function GalleryDashboardPage() {
             setError("Pilih gambar untuk diupload");
             return;
         }
-        // setSaving(true);
+
+        // Double-check file size before submitting
+        if (imageFile && imageFile.size > MAX_FILE_SIZE) {
+            const sizeMB = (imageFile.size / (1024 * 1024)).toFixed(1);
+            setError(`Ukuran file terlalu besar (${sizeMB}MB). Maksimal 10MB per file.`);
+            return;
+        }
+
+        setSaving(true);
         setError("");
         try {
             const data = { ...formData };
@@ -147,7 +174,16 @@ export default function GalleryDashboardPage() {
             fetchData();
             setTimeout(() => setSuccess(""), 3000);
         } catch (err) {
-            setError(err.message);
+            // Parse and display more helpful error messages
+            let errorMsg = err.message;
+            if (errorMsg.includes("LIMIT_FILE_SIZE") || errorMsg.includes("terlalu besar")) {
+                errorMsg = "Ukuran file terlalu besar. Maksimal 10MB per file. Silakan kompres gambar terlebih dahulu.";
+            } else if (errorMsg.includes("Format file") || errorMsg.includes("file type")) {
+                errorMsg = "Format file tidak didukung. Gunakan JPEG, PNG, GIF, WebP, atau SVG.";
+            } else if (errorMsg.includes("network") || errorMsg.includes("fetch")) {
+                errorMsg = "Gagal terhubung ke server. Periksa koneksi internet Anda dan coba lagi.";
+            }
+            setError(errorMsg);
         } finally {
             setSaving(false);
         }
@@ -457,7 +493,7 @@ export default function GalleryDashboardPage() {
                                         <div className="py-6">
                                             <Upload size={32} className="text-blue-300 mx-auto mb-2" />
                                             <p className="text-sm font-medium text-slate-500">Klik atau drag file ke sini</p>
-                                            <p className="text-xs text-slate-400 mt-1">PNG, JPG atau WEBP (Maks. 5MB)</p>
+                                            <p className="text-xs text-slate-400 mt-1">PNG, JPG, GIF, WebP atau SVG (Maks. 10MB)</p>
                                         </div>
                                     )}
                                     <input type="file" accept="image/*" onChange={handleImageChange} className="w-full text-sm text-slate-500 mt-3 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 transition-colors cursor-pointer" />
