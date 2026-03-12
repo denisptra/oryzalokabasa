@@ -102,7 +102,7 @@ const mediaFilter = (req, file, cb) => {
 
 // Max file size
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
-const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
 
 // Multer instances
 const uploadGallery = multer({

@@ -59,7 +59,7 @@ const fetchData = async (url, options, endpoint, isGet) => {
   if (!contentType.includes("application/json")) {
     // Server returned non-JSON (e.g. Nginx HTML error page)
     if (response.status === 413) {
-      throw new Error("Ukuran file terlalu besar. Batas maksimal adalah 10MB (Gambar) atau 50MB (Video). Silakan coba lagi dengan file yang lebih kecil.");
+      throw new Error("Ukuran file terlalu besar. Batas maksimal adalah 10MB (Gambar) atau 100MB (Video). Silakan coba lagi dengan file yang lebih kecil.");
     }
     if (response.status === 502 || response.status === 504) {
       throw new Error("Server sedang tidak tersedia. Silakan coba lagi nanti.");
@@ -143,7 +143,7 @@ export const uploadWithProgress = (endpoint, formData, onProgress) => {
           reject(new Error(errorData.message || "Gagal mengunggah file"));
         } catch (e) {
           if (xhr.status === 413) {
-            reject(new Error("Ukuran file terlalu besar. Batas maksimal adalah 50MB."));
+            reject(new Error("Ukuran file terlalu besar. Batas maksimal adalah 100MB."));
           } else {
             reject(new Error(`Server error (${xhr.status})`));
           }

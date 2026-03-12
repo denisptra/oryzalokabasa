@@ -260,7 +260,7 @@ export default function VideoManagementPage() {
                                             <Video size={24} />
                                         </div>
                                         <span className="text-xs font-bold text-slate-600 text-center px-4 leading-relaxed whitespace-pre-line">
-                                             {file ? file.name : "Klik untuk memilih file video\nFormat: MP4, WebM (Maks. 50MB)"}
+                                             {file ? file.name : "Klik untuk memilih file video\nFormat: MP4, WebM (Maks. 100MB)"}
                                          </span>
                                     </label>
                                 </div>
