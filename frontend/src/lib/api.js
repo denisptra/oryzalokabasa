@@ -637,7 +637,7 @@ export const analyticsAPI = {
 // ===================== VIDEO API =====================
 export const videoAPI = {
   getActive: async () => {
-    return apiFetch("/homepage-video/active");
+    return apiFetch("/homepage-video/active", { cache: "no-store", headers: { 'Cache-Control': 'no-cache' } });
   },
 
   getAll: async () => {

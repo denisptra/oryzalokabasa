@@ -130,6 +130,7 @@ const VideoSection = ({ videoUrl }) => {
     <motion.section className="py-6 md:py-16 px-6 max-w-7xl mx-auto" initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1.5 }} viewport={{ once: true }}>
       <div onClick={toggleVideo} className="aspect-video bg-black rounded-2xl md:rounded-3xl overflow-hidden relative group cursor-pointer shadow-2xl">
         <video 
+          key={videoUrl || "default"}
           ref={videoRef} 
           autoPlay 
           muted 

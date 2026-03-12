@@ -16,8 +16,8 @@ if (useCloudinary) {
 }
 
 // Ensure local uploads directory exists
-const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-const uploadsDir = isProduction
+const isVercel = Boolean(process.env.VERCEL);
+const uploadsDir = isVercel
     ? path.join("/tmp", "uploads")
     : path.join(__dirname, "../../uploads");
 

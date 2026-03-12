@@ -25,8 +25,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded files
-const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-const uploadsPath = isProduction ? path.join("/tmp", "uploads") : path.join(__dirname, "../uploads");
+const isVercel = Boolean(process.env.VERCEL);
+const uploadsPath = isVercel ? path.join("/tmp", "uploads") : path.join(__dirname, "../uploads");
 app.use("/uploads", express.static(uploadsPath));
 
 // Routes
