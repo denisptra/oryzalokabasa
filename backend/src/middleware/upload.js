@@ -53,20 +53,26 @@ const localStorage = multer.diskStorage({
 });
 
 // Cloudinary Storage configuration
-const getCloudinaryStorage = (folderName) => {
+const getCloudinaryStorage = (folderName, resourceType = "image") => {
+    const params = {
+        folder: `oryzalokabasa/${folderName}`,
+        resource_type: resourceType === "video" ? "video" : "auto",
+    };
+
+    // Only apply heavy transformations to images
+    if (resourceType === "image") {
+        params.transformation = [{ width: 1200, crop: "limit", quality: "auto", fetch_format: "auto" }];
+    }
+
     return new CloudinaryStorage({
         cloudinary: cloudinary,
-        params: {
-            folder: `oryzalokabasa/${folderName}`,
-            resource_type: "auto", // Penting: agar bisa upload video
-            transformation: [{ width: 1200, crop: "limit", quality: "auto", fetch_format: "auto" }],
-        },
+        params: params,
     });
 };
 
 // Select storage strategy based on upload type
-const getStorage = (folder) => {
-    return useCloudinary ? getCloudinaryStorage(folder) : localStorage;
+const getStorage = (folder, resourceType = "image") => {
+    return useCloudinary ? getCloudinaryStorage(folder, resourceType) : localStorage;
 };
 
 // File filter - images and videos
@@ -124,7 +130,7 @@ const uploadTeam = multer({
 });
 
 const uploadVideo = multer({
-    storage: getStorage('videos'),
+    storage: getStorage('videos', 'video'),
     fileFilter: mediaFilter,
     limits: { fileSize: MAX_VIDEO_SIZE },
 });

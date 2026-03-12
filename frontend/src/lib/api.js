@@ -100,6 +100,62 @@ const fetchData = async (url, options, endpoint, isGet) => {
   return data;
 };
 
+// Helper for uploads with progress tracking (uses XMLHttpRequest because fetch doesn't support progress)
+export const uploadWithProgress = (endpoint, formData, onProgress) => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const url = `${API_BASE_URL}${endpoint}`;
+
+    xhr.open("POST", url);
+
+    // Add auth token if available
+    const token = getToken();
+    if (token) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    }
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && onProgress) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        onProgress(percentComplete);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          // Update cache for the module
+          const segments = endpoint.split('/').filter(Boolean);
+          const basePath = segments[0] || '';
+          if (basePath && typeof window !== "undefined") {
+            for (const key of getCache.keys()) {
+              if (key.includes(`/${basePath}`)) getCache.delete(key);
+            }
+          }
+          resolve(data);
+        } catch (e) {
+          resolve({ status: "success" }); // Fallback if not JSON
+        }
+      } else {
+        try {
+          const errorData = JSON.parse(xhr.responseText);
+          reject(new Error(errorData.message || "Gagal mengunggah file"));
+        } catch (e) {
+          if (xhr.status === 413) {
+            reject(new Error("Ukuran file terlalu besar. Batas maksimal adalah 50MB."));
+          } else {
+            reject(new Error(`Server error (${xhr.status})`));
+          }
+        }
+      }
+    };
+
+    xhr.onerror = () => reject(new Error("Terjadi kesalahan koneksi internet atau server."));
+    xhr.send(formData);
+  });
+};
+
 // ===================== AUTH API =====================
 export const authAPI = {
   register: async (name, email, password) => {
@@ -588,13 +644,10 @@ export const videoAPI = {
     return apiFetch("/homepage-video/");
   },
 
-  save: async (data) => {
-    // If it's FormData (for file upload), just pass it
+  save: async (data, onProgress) => {
+    // If it's FormData (for file upload), use uploadWithProgress
     if (data instanceof FormData) {
-      return apiFetch("/homepage-video/save", {
-        method: "POST",
-        body: data,
-      });
+      return uploadWithProgress("/homepage-video/save", data, onProgress);
     }
     
     // Otherwise it's regular JSON (for title/status updates)

@@ -25,6 +25,7 @@ export default function VideoManagementPage() {
     const [formData, setFormData] = useState({ title: "", isActive: true });
     const [file, setFile] = useState(null);
     const [saving, setSaving] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
@@ -75,7 +76,10 @@ export default function VideoManagementPage() {
             fd.append("isActive", formData.isActive);
             if (file) fd.append("videoFile", file);
 
-            await videoAPI.save(fd);
+            setUploadProgress(0);
+            await videoAPI.save(fd, (progress) => {
+                setUploadProgress(progress);
+            });
             setSuccess(editingVideo ? "Video diperbarui!" : "Video berhasil diunggah!");
             setShowModal(false);
             fetchData();
@@ -275,6 +279,24 @@ export default function VideoManagementPage() {
                                 />
                                 <label htmlFor="isActiveCheckbox" className="text-sm font-bold text-slate-700 cursor-pointer select-none">Tampilkan langsung (Aktifkan)</label>
                             </div>
+
+                            {saving && (
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                        <span>Proses Unggah</span>
+                                        <span>{uploadProgress}%</span>
+                                    </div>
+                                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-100">
+                                        <div 
+                                            className="h-full bg-red-600 transition-all duration-300 ease-out shadow-[0_0_8px_rgba(220,38,38,0.5)]"
+                                            style={{ width: `${uploadProgress}%` }}
+                                        />
+                                    </div>
+                                    {uploadProgress === 100 && (
+                                        <p className="text-[10px] text-slate-400 italic text-center animate-pulse">Menyimpan ke server...</p>
+                                    )}
+                                </div>
+                            )}
 
                             <div className="flex gap-3 pt-6">
                                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-colors text-sm uppercase tracking-wider">Batal</button>
