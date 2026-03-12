@@ -26,6 +26,14 @@ class VideoService {
             throw new Error("URL video tidak boleh kosong");
         }
 
+        // Deactivate others if this one is set to active
+        if (isActive === true || isActive === "true") {
+            await prisma.homepageVideo.updateMany({
+                where: { isActive: true },
+                data: { isActive: false }
+            });
+        }
+
         if (id) {
             // Update existing
             return await prisma.homepageVideo.update({
@@ -33,25 +41,17 @@ class VideoService {
                 data: { 
                     title, 
                     url, 
-                    isActive: isActive !== undefined ? isActive : true,
+                    isActive: isActive === true || isActive === "true",
                     updatedAt: new Date()
                 }
             });
         } else {
             // Create new
-            // Deactivate others if this is active
-            if (isActive !== false) {
-                await prisma.homepageVideo.updateMany({
-                    where: { isActive: true },
-                    data: { isActive: false }
-                });
-            }
-
             return await prisma.homepageVideo.create({
                 data: {
                     title,
                     url,
-                    isActive: isActive !== undefined ? isActive : true
+                    isActive: isActive === true || isActive === "true"
                 }
             });
         }

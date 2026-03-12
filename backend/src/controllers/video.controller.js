@@ -22,6 +22,11 @@ exports.getAllVideos = async (req, res) => {
 exports.saveVideo = async (req, res) => {
     try {
         let data = { ...req.body };
+
+        // Convert isActive to boolean (it comes as string from FormData)
+        if (data.isActive !== undefined) {
+            data.isActive = data.isActive === "true" || data.isActive === true;
+        }
         
         // Handle file upload
         if (req.file) {

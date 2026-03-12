@@ -255,9 +255,9 @@ export default function VideoManagementPage() {
                                         <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 ${file ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-slate-100 text-slate-400'}`}>
                                             <Video size={24} />
                                         </div>
-                                        <span className="text-xs font-bold text-slate-600 text-center px-4 leading-relaxed">
-                                            {file ? file.name : "Klik untuk memilih file video\nFormat: MP4, WebM (Maks. 50MB)"}
-                                        </span>
+                                        <span className="text-xs font-bold text-slate-600 text-center px-4 leading-relaxed whitespace-pre-line">
+                                             {file ? file.name : "Klik untuk memilih file video\nFormat: MP4, WebM (Maks. 50MB)"}
+                                         </span>
                                     </label>
                                 </div>
                                 {editingVideo && !file && (

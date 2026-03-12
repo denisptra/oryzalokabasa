@@ -129,8 +129,16 @@ const VideoSection = ({ videoUrl }) => {
   return (
     <motion.section className="py-6 md:py-16 px-6 max-w-7xl mx-auto" initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1.5 }} viewport={{ once: true }}>
       <div onClick={toggleVideo} className="aspect-video bg-black rounded-2xl md:rounded-3xl overflow-hidden relative group cursor-pointer shadow-2xl">
-        <video ref={videoRef} autoPlay muted loop playsInline controls className="w-full h-full object-cover">
-          <source src={videoUrl ? getImageUrl(videoUrl) : "/Video-1.mp4"} type="video/mp4" />
+        <video 
+          ref={videoRef} 
+          autoPlay 
+          muted 
+          loop 
+          playsInline 
+          controls 
+          className="w-full h-full object-cover"
+          src={videoUrl ? getImageUrl(videoUrl) : "/Video-1.mp4"}
+        >
         </video>
         {!isPlaying && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
