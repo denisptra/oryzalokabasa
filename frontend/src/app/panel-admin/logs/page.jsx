@@ -5,7 +5,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { logAPI } from "@/lib/api";
 import {
     ScrollText,
-    Search,
     Loader,
     AlertCircle,
     Clock,
@@ -14,6 +13,10 @@ import {
     X,
     Filter,
 } from "lucide-react";
+
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import AdminFilters from "@/components/admin/AdminFilters";
+import AdminTable from "@/components/admin/AdminTable";
 
 const ACTION_COLORS = {
     CREATE: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -84,138 +87,103 @@ export default function LogsPage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header */}
-            <div>
-                <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                    <ScrollText size={28} className="text-blue-600" />
-                    Log Aktivitas
-                </h1>
-                <p className="text-slate-500 mt-1">Riwayat semua aktivitas di sistem</p>
-            </div>
+        <div className="max-w-7xl mx-auto space-y-6 pb-20">
+            <AdminPageHeader 
+                title="Log Aktivitas" 
+                subtitle="Riwayat semua aktivitas di sistem"
+                icon={ScrollText}
+                stats={[{ label: "Total Aktivitas", value: logs.length }]}
+            />
 
             {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 animate-in slide-in-from-top">
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top duration-300">
                     <AlertCircle size={20} className="text-red-600" />
-                    <p className="text-sm text-red-700">{error}</p>
+                    <p className="text-sm font-bold text-red-700">{error}</p>
                 </div>
             )}
 
-            {/* Filter & Search */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                    <Search size={18} className="absolute left-3 top-3 text-slate-400" />
-                    <input
-                        type="text"
-                        placeholder="Cari aktivitas, user, atau module..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-sm"
-                    />
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                    <div className="flex items-center gap-2">
-                        <Filter size={18} className="text-slate-400 hidden sm:block" />
-                        <span className="text-sm font-medium text-slate-500 hidden sm:block">Filter:</span>
-                    </div>
-                    <button
-                        onClick={() => setModuleFilter("all")}
-                        className={`px-4 py-2 text-sm font-bold rounded-xl transition-all border ${moduleFilter === "all" ? "bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}
-                    >
-                        Semua
-                    </button>
-                    {["AUTH", "POST", "GALLERY", "HERO_SLIDER", "USER", "SETTING"].map((mod) => (
-                        <button
-                            key={mod}
-                            onClick={() => setModuleFilter(mod)}
-                            className={`px-4 py-2 text-sm font-bold rounded-xl transition-all border ${moduleFilter === mod ? "bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}
-                        >
-                            {mod}
-                        </button>
-                    ))}
-                </div>
-            </div>
+            <AdminFilters 
+                search={search}
+                onSearchChange={setSearch}
+                placeholder="Cari aktivitas, user, atau module..."
+                dropdowns={[
+                    {
+                        label: "Modul",
+                        value: moduleFilter,
+                        onChange: setModuleFilter,
+                        options: [
+                            { id: "AUTH", name: "AUTH" },
+                            { id: "POST", name: "POST" },
+                            { id: "GALLERY", name: "GALLERY" },
+                            { id: "HERO_SLIDER", name: "HERO_SLIDER" },
+                            { id: "USER", name: "USER" },
+                            { id: "SETTING", name: "SETTING" }
+                        ],
+                        icon: Filter,
+                        allLabel: "Semua Modul"
+                    }
+                ]}
+            />
 
-            {/* Logs Table List */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                {loading ? (
-                    <div className="flex items-center justify-center py-16">
-                        <Loader className="animate-spin text-blue-600" size={32} />
-                    </div>
-                ) : filteredLogs.length === 0 ? (
-                    <div className="text-center py-16">
-                        <ScrollText size={48} className="text-slate-200 mx-auto mb-3" />
-                        <p className="text-slate-500 font-medium">Belum ada log aktivitas ditemukan</p>
-                    </div>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="border-b border-slate-200 bg-slate-50">
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-12 text-center">#</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Modul</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Pengguna</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Waktu</th>
-                                    <th className="px-4 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Detail</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {filteredLogs.map((log, index) => (
-                                    <tr
-                                        key={log.id}
-                                        className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
-                                        onClick={() => setDetailLog(log)}
-                                    >
-                                        <td className="px-4 py-4 text-center text-sm font-medium text-slate-400">
-                                            {index + 1}
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider border ${ACTION_COLORS[log.action] || ACTION_COLORS.CREATE}`}>
-                                                {log.action}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <span className={`text-xs font-bold ${MODULE_COLORS[log.module] || "text-slate-500"}`}>
-                                                {log.module}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0 hidden sm:flex">
-                                                    <User size={14} className="text-slate-400" />
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <p className="text-sm font-medium text-slate-800 truncate">
-                                                        {log.user?.name || "System"}
-                                                    </p>
-                                                    <p className="text-xs text-slate-500 truncate">
-                                                        {log.user?.email || "-"}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-4 text-sm text-slate-500">
-                                            <div className="flex items-center gap-1.5">
-                                                <Clock size={14} className="text-slate-400" />
-                                                <span>{formatDate(log.createdAt)}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-4 text-right">
-                                            <button
-                                                className="p-2 rounded-lg text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50 transition-colors inline-block"
-                                                title="Lihat Detail"
-                                            >
-                                                <Info size={16} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+            <AdminTable 
+                columns={[
+                    { label: "#", className: "w-12 text-center" },
+                    { label: "Aksi", className: "w-32" },
+                    { label: "Modul", className: "w-32" },
+                    { label: "Pengguna" },
+                    { label: "Waktu", className: "w-48" },
+                    { label: "Detail", className: "text-right w-24" }
+                ]}
+                data={filteredLogs}
+                loading={loading}
+                renderRow={(log, index) => (
+                    <tr 
+                        key={log.id} 
+                        className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                        onClick={() => setDetailLog(log)}
+                    >
+                        <td className="px-4 py-4 text-center text-sm font-bold text-slate-400">
+                            {index + 1}
+                        </td>
+                        <td className="px-4 py-4">
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border shadow-xs ${ACTION_COLORS[log.action] || ACTION_COLORS.CREATE}`}>
+                                {log.action}
+                            </span>
+                        </td>
+                        <td className="px-4 py-4">
+                            <span className={`text-xs font-bold ${MODULE_COLORS[log.module] || "text-slate-500"}`}>
+                                {log.module}
+                            </span>
+                        </td>
+                        <td className="px-4 py-4">
+                            <div className="flex items-center gap-2">
+                                <div className="hidden sm:flex w-8 h-8 rounded-full bg-slate-100 items-center justify-center shrink-0 border border-slate-200">
+                                    <User size={14} className="text-slate-400" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-sm font-bold text-slate-800 truncate">
+                                        {log.user?.name || "System"}
+                                    </p>
+                                    <p className="text-[10px] text-slate-500 truncate font-medium">
+                                        {log.user?.email || "-"}
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+                        <td className="px-4 py-4">
+                            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold whitespace-nowrap">
+                                <Clock size={14} className="text-slate-400" />
+                                <span>{formatDate(log.createdAt)}</span>
+                            </div>
+                        </td>
+                        <td className="px-4 py-4 text-right">
+                            <button className="p-2 rounded-lg text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50 transition-all border border-transparent group-hover:border-blue-100">
+                                <Info size={16} />
+                            </button>
+                        </td>
+                    </tr>
                 )}
-            </div>
+            />
 
             {/* Detail Modal */}
             {detailLog && (

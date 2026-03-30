@@ -17,13 +17,21 @@ import {
     EyeOff
 } from "lucide-react";
 
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import DeleteModal from "@/components/admin/DeleteModal";
+
 export default function VideoManagementPage() {
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    
+    // Modal State
     const [editingVideo, setEditingVideo] = useState(null);
     const [formData, setFormData] = useState({ title: "", isActive: true });
     const [file, setFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(null);
+    
+    // Upload State
     const [saving, setSaving] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
@@ -31,10 +39,11 @@ export default function VideoManagementPage() {
 
     const fetchData = async () => {
         try {
+            setLoading(true);
             const res = await videoAPI.getAll();
             setVideos(res.data || []);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || "Gagal memuat daftar video");
         } finally {
             setLoading(false);
         }
@@ -42,26 +51,48 @@ export default function VideoManagementPage() {
 
     useEffect(() => {
         fetchData();
+        return () => {
+            // Cleanup preview URL memory leak
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        };
     }, []);
 
-    const openCreate = () => {
-        setEditingVideo(null);
-        setFormData({ title: "", isActive: true });
-        setFile(null);
+    // Handle File Selection
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (!selectedFile) return;
+
+        // Validasi ukuran max 100MB
+        if (selectedFile.size > 100 * 1024 * 1024) {
+            setError("Ukuran file terlalu besar. Maksimal 100MB.");
+            e.target.value = null;
+            return;
+        }
+
+        setFile(selectedFile);
         setError("");
-        setShowModal(true);
+        
+        // Buat preview URL jika ada file yang diupload (selain itu revoke yang lama)
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(URL.createObjectURL(selectedFile));
     };
 
-    const openEdit = (video) => {
+    const openModal = (video = null) => {
         setEditingVideo(video);
-        setFormData({ title: video.title || "", isActive: video.isActive });
+        setFormData({ 
+            title: video?.title || "", 
+            isActive: video ? video.isActive : true 
+        });
         setFile(null);
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(video?.url ? getImageUrl(video.url) : null);
         setError("");
         setShowModal(true);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
         if (!file && !editingVideo) {
             setError("Silakan pilih file video untuk diunggah");
             return;
@@ -69,6 +100,7 @@ export default function VideoManagementPage() {
 
         setSaving(true);
         setError("");
+        
         try {
             const fd = new FormData();
             if (editingVideo) fd.append("id", editingVideo.id);
@@ -80,14 +112,16 @@ export default function VideoManagementPage() {
             await videoAPI.save(fd, (progress) => {
                 setUploadProgress(progress);
             });
-            setSuccess(editingVideo ? "Video diperbarui!" : "Video berhasil diunggah!");
+            
+            setSuccess(editingVideo ? "Video berhasil diperbarui!" : "Video berhasil diunggah!");
             setShowModal(false);
             fetchData();
             setTimeout(() => setSuccess(""), 3000);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || "Terjadi kesalahan saat menyimpan video");
         } finally {
             setSaving(false);
+            setUploadProgress(0);
         }
     };
 
@@ -101,10 +135,14 @@ export default function VideoManagementPage() {
     };
 
     const handleDelete = async (id) => {
-        if (!confirm("Hapus video ini?")) return;
+        setDeleteConfirm(id);
+    };
+
+    const confirmDelete = async () => {
         try {
-            await videoAPI.delete(id);
+            await videoAPI.delete(deleteConfirm);
             setSuccess("Video berhasil dihapus");
+            setDeleteConfirm(null);
             fetchData();
             setTimeout(() => setSuccess(""), 3000);
         } catch (err) {
@@ -113,29 +151,28 @@ export default function VideoManagementPage() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6 pb-20">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                        <Video size={28} className="text-red-600" />
-                        Video Beranda
-                    </h1>
-                    <p className="text-slate-500 mt-1">Kelola video latar belakang untuk halaman depan</p>
-                </div>
-                <button
-                    onClick={openCreate}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-600/20 text-sm"
-                >
-                    <Plus size={18} />
-                    Unggah Video Baru
-                </button>
-            </div>
+        <div className="max-w-7xl mx-auto space-y-6 pb-20">
+            <AdminPageHeader 
+                title="Video Beranda" 
+                subtitle="Kelola video latar belakang untuk halaman depan"
+                icon={Video}
+                stats={[{ label: "Total", value: videos.length }]}
+                actions={[
+                    { label: "Unggah Video Baru", icon: Plus, onClick: () => openModal(), color: "bg-red-600 hover:bg-red-700 shadow-red-600/20" }
+                ]}
+            />
 
             {success && (
-                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 animate-in slide-in-from-top">
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top duration-300">
                     <CheckCircle size={20} className="text-emerald-600" />
-                    <p className="text-sm text-emerald-700">{success}</p>
+                    <p className="text-sm font-bold text-emerald-700">{success}</p>
+                </div>
+            )}
+
+            {error && !showModal && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top duration-300">
+                    <AlertCircle size={20} className="text-red-600" />
+                    <p className="text-sm font-bold text-red-700">{error}</p>
                 </div>
             )}
 
@@ -144,10 +181,18 @@ export default function VideoManagementPage() {
                     <Loader className="animate-spin text-red-600" size={32} />
                 </div>
             ) : videos.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-dashed border-slate-300 py-20 text-center">
-                    <Video size={48} className="text-slate-200 mx-auto mb-4" />
-                    <p className="text-slate-500 font-medium font-bold text-lg">Belum ada video yang diunggah</p>
-                    <button onClick={openCreate} className="mt-4 text-red-600 font-bold hover:underline">Unggah sekarang</button>
+                <div className="bg-white rounded-3xl border border-dashed border-slate-200 py-24 text-center">
+                    <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-6">
+                        <Video size={40} className="text-slate-200" />
+                    </div>
+                    <p className="text-slate-500 font-bold text-lg">Belum ada video yang diunggah</p>
+                    <p className="text-slate-400 text-sm mt-1 mb-8">Video ini akan tampil sebagai latar belakang di beranda utama.</p>
+                    <button 
+                        onClick={() => openModal()} 
+                        className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+                    >
+                        Unggah Video Sekarang
+                    </button>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -176,7 +221,7 @@ export default function VideoManagementPage() {
                                 <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
                                     <div className="flex gap-1">
                                         <button 
-                                            onClick={() => openEdit(video)}
+                                            onClick={() => openModal(video)}
                                             className="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                                             title="Edit"
                                         >
@@ -244,27 +289,47 @@ export default function VideoManagementPage() {
 
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-1.5">Pilih File Video</label>
-                                <div className="relative group">
-                                    <input
-                                        type="file"
-                                        onChange={(e) => setFile(e.target.files[0])}
-                                        className="hidden"
-                                        id="video-file-input"
-                                        accept="video/mp4,video/webm,video/quicktime"
-                                    />
-                                    <label
-                                        htmlFor="video-file-input"
-                                        className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${file ? 'border-red-500 bg-red-50' : 'border-slate-300 hover:border-red-400 hover:bg-slate-50'}`}
-                                    >
-                                        <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 ${file ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-slate-100 text-slate-400'}`}>
-                                            <Video size={24} />
-                                        </div>
-                                        <span className="text-xs font-bold text-slate-600 text-center px-4 leading-relaxed whitespace-pre-line">
-                                             {file ? file.name : "Klik untuk memilih file video\nFormat: MP4, WebM (Maks. 100MB)"}
-                                         </span>
-                                    </label>
-                                </div>
-                                {editingVideo && !file && (
+                                
+                                {previewUrl && (
+                                    <div className="mb-4 rounded-xl overflow-hidden border-2 border-slate-200 bg-black aspect-video relative">
+                                        <video src={previewUrl} className="w-full h-full object-cover" controls></video>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => {
+                                                setFile(null);
+                                                URL.revokeObjectURL(previewUrl);
+                                                setPreviewUrl(null);
+                                            }} 
+                                            className="absolute top-2 right-2 bg-red-600/80 text-white p-1.5 rounded-lg hover:bg-red-600 transition-colors backdrop-blur-sm"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                )}
+
+                                {!previewUrl && (
+                                    <div className="relative group">
+                                        <input
+                                            type="file"
+                                            onChange={handleFileChange}
+                                            className="hidden"
+                                            id="video-file-input"
+                                            accept="video/mp4,video/webm,video/quicktime,video/ogg"
+                                        />
+                                        <label
+                                            htmlFor="video-file-input"
+                                            className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${file ? 'border-red-500 bg-red-50' : 'border-slate-300 hover:border-red-400 hover:bg-slate-50'}`}
+                                        >
+                                            <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 ${file ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-slate-100 text-slate-400'}`}>
+                                                <Video size={24} />
+                                            </div>
+                                            <span className="text-xs font-bold text-slate-600 text-center px-4 leading-relaxed whitespace-pre-line">
+                                                {file ? file.name : "Klik untuk memilih file video\nFormat: MP4, WebM, MOV, OGG (Maks. 100MB)"}
+                                            </span>
+                                        </label>
+                                    </div>
+                                )}
+                                {editingVideo && !file && !previewUrl && (
                                     <p className="mt-2 text-[10px] text-slate-400 italic">Biarkan kosong jika tidak ingin mengganti video</p>
                                 )}
                             </div>
@@ -309,6 +374,14 @@ export default function VideoManagementPage() {
                     </div>
                 </div>
             )}
+            {/* Modals */}
+            <DeleteModal 
+                isOpen={!!deleteConfirm}
+                onClose={() => setDeleteConfirm(null)}
+                onConfirm={confirmDelete}
+                title="Hapus Video?"
+                message="Video ini akan dihapus secara permanen dari server dan tidak dapat dikembalikan."
+            />
         </div>
     );
 }

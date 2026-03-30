@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { contactAPI } from "@/lib/api";
 import {
     MessageSquare,
-    Search,
     Trash2,
     X,
     Loader,
@@ -18,6 +17,11 @@ import {
     AlertCircle,
     Filter,
 } from "lucide-react";
+
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import AdminFilters from "@/components/admin/AdminFilters";
+import AdminTable from "@/components/admin/AdminTable";
+import DeleteModal from "@/components/admin/DeleteModal";
 
 export default function ContactsPage() {
     const [messages, setMessages] = useState([]);
@@ -184,210 +188,149 @@ export default function ContactsPage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                        <MessageSquare size={28} className="text-blue-600" />
-                        Pesan Kontak
-                        {unreadCount > 0 && (
-                            <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full font-bold ml-2 shadow-sm shadow-red-500/20">
-                                {unreadCount} Baru
-                            </span>
-                        )}
-                    </h1>
-                    <p className="text-slate-500 mt-1">Kelola pesan dari pengunjung website</p>
-                </div>
-                <div className="flex items-center">
-                    <div className="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl font-bold flex items-center gap-2">
-                        <span>Total:</span>
-                        <span className="bg-white px-2 py-0.5 rounded-lg border border-blue-100">{messages.length}</span>
-                    </div>
-                </div>
-            </div>
+        <div className="max-w-7xl mx-auto space-y-6 pb-20">
+            <AdminPageHeader 
+                title="Pesan Kontak" 
+                subtitle="Kelola pesan dari pengunjung website"
+                icon={MessageSquare}
+                stats={[
+                    { label: "Total", value: messages.length },
+                    { label: "Baru", value: unreadCount, color: "text-red-600 bg-red-50" }
+                ]}
+            />
 
             {success && (
-                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 animate-in slide-in-from-top">
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top duration-300">
                     <CheckCircle size={20} className="text-emerald-600" />
-                    <p className="text-sm font-medium text-emerald-800">{success}</p>
+                    <p className="text-sm font-bold text-emerald-700">{success}</p>
                 </div>
             )}
 
             {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 animate-in slide-in-from-top">
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top duration-300">
                     <AlertCircle size={20} className="text-red-600" />
-                    <p className="text-sm font-medium text-red-800">{error}</p>
+                    <p className="text-sm font-bold text-red-700">{error}</p>
                 </div>
             )}
 
-            {/* Search & Filter */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="relative flex-1">
-                        <Search size={18} className="absolute left-3 top-3 text-slate-400" />
-                        <input
-                            type="text"
-                            placeholder="Cari pesan berdasarkan nama, email, topik..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-sm transition-all"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2 min-w-[200px]">
-                        <div className="relative w-full">
-                            <Filter className="absolute left-3 top-2.5 text-slate-400" size={18} />
-                            <select
-                                value={filter}
-                                onChange={(e) => setFilter(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-sm appearance-none font-bold text-slate-700 transition-all"
-                            >
-                                <option value="all">Semua Status</option>
-                                <option value="unread">Belum Dibaca</option>
-                                <option value="read">Dibaca</option>
-                                <option value="archived">Diarsipkan</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <AdminFilters 
+                search={search}
+                onSearchChange={setSearch}
+                placeholder="Cari pesan berdasarkan nama, email, topik..."
+                dropdowns={[
+                    {
+                        label: "Status",
+                        value: filter,
+                        onChange: setFilter,
+                        options: [
+                            { id: "unread", name: "Belum Dibaca" },
+                            { id: "read", name: "Dibaca" },
+                            { id: "archived", name: "Diarsipkan" }
+                        ],
+                        icon: Filter,
+                        allLabel: "Semua Status"
+                    }
+                ]}
+            />
 
-            {/* Bulk Actions */}
             {selectedIds.length > 0 && (
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 animate-in fade-in slide-in-from-top-2">
-                    <p className="text-sm font-bold text-blue-800 ml-2">
+                <div className="bg-blue-600 text-white rounded-2xl p-4 flex items-center justify-between shadow-lg shadow-blue-600/20 animate-in zoom-in duration-200 mb-6 font-bold">
+                    <p className="text-sm ml-2">
                         {selectedIds.length} pesan dipilih
                     </p>
                     <div className="flex gap-2">
                         <button
                             onClick={handleBulkArchive}
-                            className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center gap-2"
+                            className="px-5 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2 backdrop-blur-md border border-white/30"
                         >
-                            <Archive size={16} className="text-amber-500" />
-                            Arsipkan
+                            <Archive size={16} /> Arsipkan
                         </button>
                         <button
                             onClick={() => setBulkDeleteConfirm(true)}
-                            className="px-4 py-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center gap-2"
+                            className="px-5 py-2 bg-red-500/20 hover:bg-red-500/30 text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2 backdrop-blur-md border border-red-500/30"
                         >
-                            <Trash2 size={16} />
-                            Hapus
+                            <Trash2 size={16} /> Hapus
                         </button>
                     </div>
                 </div>
             )}
 
-            {/* Messages Table List */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                {loading ? (
-                    <div className="flex items-center justify-center py-16">
-                        <Loader className="animate-spin text-blue-600" size={32} />
-                    </div>
-                ) : filteredMessages.length === 0 ? (
-                    <div className="text-center py-16">
-                        <MessageSquare size={48} className="text-slate-200 mx-auto mb-3" />
-                        <p className="text-slate-500 font-medium">Tidak ada pesan ditemukan</p>
-                    </div>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="border-b border-slate-200 bg-slate-50">
-                                    <th className="px-5 py-4 w-12 text-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedIds.length === filteredMessages.length && filteredMessages.length > 0}
-                                            onChange={toggleSelectAll}
-                                            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                                        />
-                                    </th>
-                                    <th className="px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-16"></th>
-                                    <th className="px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider min-w-[200px]">Pengirim</th>
-                                    <th className="px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider min-w-[250px]">Pesan</th>
-                                    <th className="px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                                    <th className="px-5 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Waktu</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {filteredMessages.map((msg) => (
-                                    <tr
-                                        key={msg.id}
-                                        className={`hover:bg-slate-50/80 transition-colors group ${selectedIds.includes(msg.id) ? 'bg-blue-50/50' : ''} ${msg.status === "UNREAD" ? 'bg-slate-50/30' : ''}`}
-                                    >
-                                        <td className="px-5 py-4 text-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedIds.includes(msg.id)}
-                                                onChange={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleSelect(msg.id);
-                                                }}
-                                                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                                            />
-                                        </td>
-                                        <td className="px-5 py-4 text-center">
-                                            <button
-                                                onClick={() => handleView(msg)}
-                                                className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mx-auto transition-transform group-hover:scale-110 shadow-sm ${msg.status === "UNREAD"
-                                                        ? "bg-gradient-to-br from-blue-500 to-blue-600"
-                                                        : msg.status === "ARCHIVED"
-                                                            ? "bg-gradient-to-br from-amber-400 to-amber-500"
-                                                            : "bg-gradient-to-br from-slate-300 to-slate-400"
-                                                    }`}
-                                            >
-                                                {msg.status === "UNREAD" ? (
-                                                    <Mail size={16} className="text-white" />
-                                                ) : msg.status === "ARCHIVED" ? (
-                                                    <Archive size={16} className="text-white" />
-                                                ) : (
-                                                    <MailOpen size={16} className="text-white" />
-                                                )}
-                                            </button>
-                                        </td>
-                                        <td className="px-5 py-4 cursor-pointer" onClick={() => handleView(msg)}>
-                                            <div className="flex flex-col">
-                                                <span className={`text-sm truncate max-w-[180px] ${msg.status === "UNREAD" ? "font-bold text-slate-900" : "font-bold text-slate-700"}`}>
-                                                    {msg.name || "Anonim"}
-                                                </span>
-                                                <span className="text-xs text-slate-500 truncate max-w-[180px] mt-0.5">
-                                                    {msg.email}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="px-5 py-4 cursor-pointer" onClick={() => handleView(msg)}>
-                                            <div className="flex flex-col">
-                                                {msg.topic && (
-                                                    <span className={`text-sm truncate max-w-[250px] ${msg.status === "UNREAD" ? "font-bold text-slate-800" : "font-bold text-slate-600"}`}>
-                                                        {msg.topic}
-                                                    </span>
-                                                )}
-                                                <span className={`text-sm line-clamp-1 max-w-[300px] ${msg.topic ? 'mt-0.5' : ''} ${msg.status === "UNREAD" ? "text-slate-700" : "text-slate-500"}`}>
-                                                    {msg.message}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="px-5 py-4 cursor-pointer" onClick={() => handleView(msg)}>
-                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider border ${getStatusBadge(msg.status)}`}>
-                                                {getStatusLabel(msg.status)}
-                                            </span>
-                                        </td>
-                                        <td className="px-5 py-4 text-right cursor-pointer" onClick={() => handleView(msg)}>
-                                            <div className="flex items-center justify-end gap-1.5 text-sm text-slate-500 font-medium">
-                                                <Clock size={14} className="text-slate-400" />
-                                                {msg.createdAt
-                                                    ? new Date(msg.createdAt).toLocaleDateString("id-ID", {
-                                                        day: "numeric", month: "short", year: "numeric"
-                                                    })
-                                                    : "-"}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+            <AdminTable 
+                columns={[
+                    { label: "", className: "w-16" },
+                    { label: "Pengirim", className: "min-w-[200px]" },
+                    { label: "Pesan", className: "min-w-[250px]" },
+                    { label: "Status" },
+                    { label: "Waktu", className: "text-right w-40" }
+                ]}
+                data={filteredMessages}
+                loading={loading}
+                selectedIds={selectedIds}
+                onSelectAll={toggleSelectAll}
+                onSelectOne={toggleSelect}
+                renderRow={(msg, idx, isSelected) => (
+                    <tr 
+                        key={msg.id} 
+                        className={`hover:bg-slate-50/80 transition-colors group cursor-pointer ${isSelected ? 'bg-blue-50/50' : ''} ${msg.status === "UNREAD" ? 'bg-blue-50/20' : ''}`}
+                        onClick={() => handleView(msg)}
+                    >
+                        <td className="px-4 py-4 text-center" onClick={(e) => e.stopPropagation()}>
+                            <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => toggleSelect(msg.id)}
+                                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                            />
+                        </td>
+                        <td className="px-4 py-4">
+                            <div className="flex items-center justify-center">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm ${
+                                    msg.status === "UNREAD" ? "bg-linear-to-br from-blue-500 to-blue-600" : 
+                                    msg.status === "ARCHIVED" ? "bg-linear-to-br from-amber-400 to-amber-500" : 
+                                    "bg-linear-to-br from-slate-300 to-slate-400"
+                                }`}>
+                                    {msg.status === "UNREAD" ? <Mail size={16} className="text-white" /> : 
+                                     msg.status === "ARCHIVED" ? <Archive size={16} className="text-white" /> : 
+                                     <MailOpen size={16} className="text-white" />}
+                                </div>
+                            </div>
+                        </td>
+                        <td className="px-4 py-4">
+                            <div className="flex flex-col">
+                                <span className={`text-sm truncate max-w-[180px] ${msg.status === "UNREAD" ? "font-bold text-slate-900" : "font-semibold text-slate-700"}`}>
+                                    {msg.name || "Anonim"}
+                                </span>
+                                <span className="text-xs text-slate-500 truncate max-w-[180px] mt-0.5 font-medium">
+                                    {msg.email}
+                                </span>
+                            </div>
+                        </td>
+                        <td className="px-4 py-4 text-sm">
+                            <div className="flex flex-col">
+                                {msg.topic && (
+                                    <span className={`truncate max-w-[250px] ${msg.status === "UNREAD" ? "font-bold text-slate-800" : "font-semibold text-slate-600"}`}>
+                                        {msg.topic}
+                                    </span>
+                                )}
+                                <span className={`line-clamp-1 max-w-[300px] ${msg.topic ? 'mt-0.5' : ''} ${msg.status === "UNREAD" ? "text-slate-700 font-medium" : "text-slate-500"}`}>
+                                    {msg.message}
+                                </span>
+                            </div>
+                        </td>
+                        <td className="px-4 py-4">
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${getStatusBadge(msg.status)} shadow-xs`}>
+                                {getStatusLabel(msg.status)}
+                            </span>
+                        </td>
+                        <td className="px-4 py-4 text-right">
+                            <div className="flex items-center justify-end gap-1.5 text-xs text-slate-500 font-bold whitespace-nowrap">
+                                <Clock size={14} className="text-slate-400" />
+                                {msg.createdAt ? new Date(msg.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "-"}
+                            </div>
+                        </td>
+                    </tr>
                 )}
-            </div>
+            />
 
             {/* View Message Modal */}
             {viewMessage && (
@@ -405,7 +348,7 @@ export default function ContactsPage() {
 
                         <div className="p-6 overflow-y-auto flex-1 space-y-6">
                             <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
-                                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xl font-bold shadow-md">
+                                <div className="w-14 h-14 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xl font-bold shadow-md">
                                     {viewMessage.name?.charAt(0)?.toUpperCase() || "?"}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -478,39 +421,23 @@ export default function ContactsPage() {
                 </div>
             )}
 
-            {/* Delete Confirm Modal */}
-            {deleteConfirm && (
-                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
-                        <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 border-4 border-red-100">
-                            <Trash2 size={24} className="text-red-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">Hapus Pesan?</h3>
-                        <p className="text-sm text-slate-500 mb-6 px-4">Pesan ini akan dihapus permanen dari sistem.</p>
-                        <div className="flex gap-3">
-                            <button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-colors text-sm">Batal</button>
-                            <button onClick={() => handleDelete(deleteConfirm)} className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors text-sm shadow-lg shadow-red-600/20">Hapus</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Modals */}
+            <DeleteModal 
+                isOpen={!!deleteConfirm}
+                onClose={() => setDeleteConfirm(null)}
+                onConfirm={() => handleDelete(deleteConfirm)}
+                title="Hapus Pesan?"
+                message="Pesan ini akan dihapus secara permanen dari galeri sistem."
+            />
 
-            {/* Bulk Delete Confirm Modal */}
-            {bulkDeleteConfirm && (
-                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
-                        <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 border-4 border-red-100">
-                            <Trash2 size={24} className="text-red-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">Hapus {selectedIds.length} Pesan?</h3>
-                        <p className="text-sm text-slate-500 mb-6 px-4">Semua pesan yang dipilih akan dihapus permanen.</p>
-                        <div className="flex gap-3">
-                            <button onClick={() => setBulkDeleteConfirm(false)} className="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-colors text-sm">Batal</button>
-                            <button onClick={handleBulkDelete} className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors text-sm shadow-lg shadow-red-600/20">Hapus Semua</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <DeleteModal 
+                isOpen={bulkDeleteConfirm}
+                onClose={() => setBulkDeleteConfirm(false)}
+                onConfirm={handleBulkDelete}
+                isBulk={true}
+                count={selectedIds.length}
+                message="Semua pesan yang dipilih akan dihapus permanen dari sistem."
+            />
         </div>
     );
 }

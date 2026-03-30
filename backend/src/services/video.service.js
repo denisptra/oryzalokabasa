@@ -22,8 +22,9 @@ class VideoService {
     async saveVideo(data) {
         const { id, title, url, isActive } = data;
 
-        if (!url) {
-            throw new Error("URL video tidak boleh kosong");
+        // Pastikan URL ada jika ini adalah video baru
+        if (!id && !url) {
+            throw new Error("URL video tidak boleh kosong untuk video baru");
         }
 
         // Deactivate others if this one is set to active
@@ -36,20 +37,26 @@ class VideoService {
 
         if (id) {
             // Update existing
+            const updateData = { 
+                title, 
+                isActive: isActive === true || isActive === "true",
+                updatedAt: new Date()
+            };
+            
+            // Hanya perbarui URL jika ada file baru yang diunggah
+            if (url) {
+                updateData.url = url;
+            }
+
             return await prisma.homepageVideo.update({
                 where: { id },
-                data: { 
-                    title, 
-                    url, 
-                    isActive: isActive === true || isActive === "true",
-                    updatedAt: new Date()
-                }
+                data: updateData
             });
         } else {
             // Create new
             return await prisma.homepageVideo.create({
                 data: {
-                    title,
+                    title: title || null,
                     url,
                     isActive: isActive === true || isActive === "true"
                 }

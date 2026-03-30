@@ -9,7 +9,6 @@ import {
     Plus,
     Edit3,
     Trash2,
-    Search,
     X,
     Loader,
     Shield,
@@ -18,6 +17,11 @@ import {
     CheckCircle,
     Filter
 } from "lucide-react";
+
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import AdminFilters from "@/components/admin/AdminFilters";
+import AdminTable from "@/components/admin/AdminTable";
+import DeleteModal from "@/components/admin/DeleteModal";
 
 export default function UsersPage() {
     const { user } = useAuth();
@@ -163,74 +167,50 @@ export default function UsersPage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                        <Users size={28} className="text-blue-600" />
-                        Kelola Pengguna
-                    </h1>
-                    <p className="text-slate-500 mt-1">Manajemen akun pengguna sistem</p>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                    <div className="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl font-bold flex items-center gap-2">
-                        <span>Total:</span>
-                        <span className="bg-white px-2 py-0.5 rounded-lg border border-blue-100">{users.length}</span>
-                    </div>
-                    <button
-                        onClick={openCreate}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20"
-                    >
-                        <Plus size={18} />
-                        Tambah User
-                    </button>
-                </div>
-            </div>
+        <div className="max-w-7xl mx-auto space-y-6 pb-20">
+            <AdminPageHeader 
+                title="Kelola Pengguna" 
+                subtitle="Manajemen akun pengguna sistem dan hak akses"
+                icon={Users}
+                stats={[{ label: "Total", value: users.length }]}
+                actions={[
+                    { label: "Tambah User", icon: Plus, onClick: openCreate }
+                ]}
+            />
 
-            {/* Alerts */}
             {success && (
-                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3">
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top duration-300">
                     <CheckCircle size={20} className="text-emerald-600" />
-                    <p className="text-sm text-emerald-700">{success}</p>
+                    <p className="text-sm font-bold text-emerald-700">{success}</p>
                 </div>
             )}
 
-            {/* Filter & Search Bar */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                    <Search size={18} className="absolute left-3 top-3 text-slate-400" />
-                    <input
-                        type="text"
-                        placeholder="Cari pengguna berdasarkan nama atau email..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-sm"
-                    />
-                </div>
-                <div className="flex items-center gap-2 min-w-[200px]">
-                    <Filter size={18} className="text-slate-400" />
-                    <select
-                        value={roleFilter}
-                        onChange={(e) => setRoleFilter(e.target.value)}
-                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-sm bg-white"
-                    >
-                        <option value="ALL">Semua Role</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="SUPER_ADMIN">Super Admin</option>
-                    </select>
-                </div>
-            </div>
+            <AdminFilters 
+                search={search}
+                onSearchChange={setSearch}
+                placeholder="Cari pengguna berdasarkan nama atau email..."
+                dropdowns={[
+                    { 
+                        label: "Role", 
+                        value: roleFilter, 
+                        onChange: setRoleFilter, 
+                        options: [
+                            { value: "ADMIN", label: "Admin" },
+                            { value: "SUPER_ADMIN", label: "Super Admin" }
+                        ],
+                        icon: Filter
+                    }
+                ]}
+            />
 
-            {/* Bulk Actions */}
             {selectedIds.length > 0 && (
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-center justify-between animate-in fade-in slide-in-from-top-2">
-                    <p className="text-sm font-medium text-blue-800 ml-2">
+                <div className="bg-blue-600 text-white rounded-2xl p-4 flex items-center justify-between shadow-lg shadow-blue-600/20 animate-in zoom-in duration-200 mb-6 font-bold">
+                    <p className="text-sm ml-2">
                         {selectedIds.length} pengguna dipilih
                     </p>
                     <button
                         onClick={() => setBulkDeleteConfirm(true)}
-                        className="px-4 py-2 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                        className="px-5 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2 backdrop-blur-md border border-white/30"
                     >
                         <Trash2 size={16} />
                         Hapus Terpilih
@@ -238,110 +218,68 @@ export default function UsersPage() {
                 </div>
             )}
 
-            {/* Users Table List */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                {loading ? (
-                    <div className="flex items-center justify-center py-16">
-                        <Loader className="animate-spin text-blue-600" size={32} />
-                    </div>
-                ) : filteredUsers.length === 0 ? (
-                    <div className="text-center py-16">
-                        <Users size={48} className="text-slate-200 mx-auto mb-3" />
-                        <p className="text-slate-500 font-medium">Tidak ada pengguna ditemukan</p>
-                    </div>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="border-b border-slate-200 bg-slate-50">
-                                    <th className="px-4 py-4 w-12 text-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedIds.length === filteredUsers.length && filteredUsers.length > 0}
-                                            onChange={toggleSelectAll}
-                                            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                                        />
-                                    </th>
-                                    <th className="px-4 py-4 w-12 text-center">No</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Pengguna</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Role</th>
-                                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Dibuat</th>
-                                    <th className="px-4 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {filteredUsers.map((u) => (
-                                    <tr
-                                        key={u.id}
-                                        className={`hover:bg-slate-50/80 transition-colors ${selectedIds.includes(u.id) ? 'bg-blue-50/50' : ''}`}
-                                    >
-
-                                        <td className="px-4 py-4 text-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedIds.includes(u.id)}
-                                                onChange={() => toggleSelect(u.id)}
-                                                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                                            />
-                                        </td>
-                                        <td className="px-4 py-4 text-center">{filteredUsers.indexOf(u) + 1}</td>
-                                        <td className="px-4 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-sm font-bold border border-slate-200">
-                                                    {u.name?.charAt(0)?.toUpperCase() || "U"}
-                                                </div>
-                                                <div>
-                                                    <span className="text-sm font-bold text-slate-800">{u.name}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-4 text-sm text-slate-600 font-medium">
-                                            {u.email}
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <span className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider ${u.role === "SUPER_ADMIN"
-                                                ? "bg-slate-800 text-white"
-                                                : "bg-slate-100 text-slate-600 border border-slate-200"
-                                                }`}>
-                                                {u.role === "SUPER_ADMIN" ? <Shield size={12} /> : <User size={12} />}
-                                                {u.role === "SUPER_ADMIN" ? "Super Admin" : "Admin"}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-4 text-sm text-slate-500">
-                                            {u.createdAt
-                                                ? new Date(u.createdAt).toLocaleDateString("id-ID", {
-                                                    day: "numeric",
-                                                    month: "short",
-                                                    year: "numeric",
-                                                })
-                                                : "-"}
-                                        </td>
-                                        <td className="px-4 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <button
-                                                    onClick={() => openEdit(u)}
-                                                    className="p-1.5 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors border border-transparent hover:border-blue-100"
-                                                    title="Edit"
-                                                >
-                                                    <Edit3 size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => setDeleteConfirm(u.id)}
-                                                    className="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors border border-transparent hover:border-red-100"
-                                                    title="Hapus"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+            <AdminTable 
+                columns={[
+                    { label: "No", className: "w-12 text-center" },
+                    { label: "Pengguna" },
+                    { label: "Email" },
+                    { label: "Role" },
+                    { label: "Dibuat", className: "w-32" },
+                    { label: "Aksi", className: "text-right w-24" }
+                ]}
+                data={filteredUsers}
+                loading={loading}
+                selectedIds={selectedIds}
+                onSelectAll={toggleSelectAll}
+                onSelectOne={toggleSelect}
+                renderRow={(u, idx, isSelected) => (
+                    <tr key={u.id} className={`hover:bg-slate-50/80 transition-colors ${isSelected ? 'bg-blue-50/50' : ''}`}>
+                        <td className="px-4 py-4 text-center">
+                            <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => toggleSelect(u.id)}
+                                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                            />
+                        </td>
+                        <td className="px-4 py-4 text-center text-xs font-bold text-slate-400">{idx + 1}</td>
+                        <td className="px-4 py-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold border border-blue-200 shadow-sm">
+                                    {u.name?.charAt(0)?.toUpperCase() || "U"}
+                                </div>
+                                <span className="text-sm font-bold text-slate-800">{u.name}</span>
+                            </div>
+                        </td>
+                        <td className="px-4 py-4 text-sm text-slate-600 font-medium">
+                            {u.email}
+                        </td>
+                        <td className="px-4 py-4">
+                            <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-lg border ${
+                                u.role === "SUPER_ADMIN" 
+                                ? "bg-slate-900 text-white border-slate-900" 
+                                : "bg-white text-slate-600 border-slate-200"
+                            } shadow-sm uppercase tracking-wider`}>
+                                {u.role === "SUPER_ADMIN" ? <Shield size={12} /> : <User size={12} />}
+                                {u.role === "SUPER_ADMIN" ? "Super Admin" : "Admin"}
+                            </span>
+                        </td>
+                        <td className="px-4 py-4 text-sm text-slate-500 font-medium whitespace-nowrap">
+                            {u.createdAt ? new Date(u.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "2y" }) : "-"}
+                        </td>
+                        <td className="px-4 py-4 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                                <button onClick={() => openEdit(u)} className="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all">
+                                    <Edit3 size={16} />
+                                </button>
+                                <button onClick={() => setDeleteConfirm(u.id)} className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all">
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
                 )}
-            </div>
+            />
 
             {/* Create / Edit Modal */}
             {showModal && (
@@ -433,63 +371,23 @@ export default function UsersPage() {
                 </div>
             )}
 
-            {/* Delete Confirm Modal */}
-            {deleteConfirm && (
-                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
-                        <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 border-4 border-red-100">
-                            <Trash2 size={24} className="text-red-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">Hapus Pengguna?</h3>
-                        <p className="text-sm text-slate-500 mb-6 px-4">
-                            Tindakan ini tidak dapat dibatalkan. Pengguna akan dihapus permanen dari sistem.
-                        </p>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setDeleteConfirm(null)}
-                                className="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-colors text-sm"
-                            >
-                                Batal
-                            </button>
-                            <button
-                                onClick={() => handleDelete(deleteConfirm)}
-                                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors text-sm shadow-lg shadow-red-600/20"
-                            >
-                                Hapus
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Modals */}
+            <DeleteModal 
+                isOpen={!!deleteConfirm}
+                onClose={() => setDeleteConfirm(null)}
+                onConfirm={() => handleDelete(deleteConfirm)}
+                title="Hapus Pengguna?"
+                message="Tindakan ini tidak dapat dibatalkan. Pengguna akan dihapus permanen dari sistem."
+            />
 
-            {/* Bulk Delete Confirm Modal */}
-            {bulkDeleteConfirm && (
-                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
-                        <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 border-4 border-red-100">
-                            <Trash2 size={24} className="text-red-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">Hapus {selectedIds.length} Pengguna?</h3>
-                        <p className="text-sm text-slate-500 mb-6 px-4">
-                            Tindakan ini tidak dapat dibatalkan. Semua pengguna yang dipilih akan dihapus.
-                        </p>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setBulkDeleteConfirm(false)}
-                                className="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-colors text-sm"
-                            >
-                                Batal
-                            </button>
-                            <button
-                                onClick={handleBulkDelete}
-                                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors text-sm shadow-lg shadow-red-600/20"
-                            >
-                                Hapus Semua
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <DeleteModal 
+                isOpen={bulkDeleteConfirm}
+                onClose={() => setBulkDeleteConfirm(false)}
+                onConfirm={handleBulkDelete}
+                isBulk={true}
+                count={selectedIds.length}
+                message="Semua pengguna yang dipilih akan dihapus permanen dari sistem."
+            />
         </div>
     );
 }
