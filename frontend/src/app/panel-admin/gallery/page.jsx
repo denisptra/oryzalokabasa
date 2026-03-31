@@ -15,6 +15,7 @@ import {
     Upload,
     Calendar,
     Filter,
+    Search,
 } from "lucide-react";
 
 import AdminPageHeader from "@/components/admin/AdminPageHeader";

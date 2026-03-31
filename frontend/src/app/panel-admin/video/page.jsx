@@ -36,6 +36,7 @@ export default function VideoManagementPage() {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
 
     const fetchData = async () => {
         try {

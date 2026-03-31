@@ -8,7 +8,7 @@ export default function AdminTable({
     loading, 
     onSelectAll, 
     onSelectOne, 
-    selectedIds,
+    selectedIds = [],
     emptyMessage = "No data found",
     emptyIcon: EmptyIcon = Info,
     renderRow

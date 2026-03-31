@@ -136,6 +136,7 @@ export default function LogsPage() {
                 ]}
                 data={filteredLogs}
                 loading={loading}
+                selectedIds={[]}
                 renderRow={(log, index) => (
                     <tr 
                         key={log.id} 

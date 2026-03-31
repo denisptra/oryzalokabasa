@@ -205,6 +205,7 @@ export default function TeamDashboardPage() {
                 ]}
                 data={members}
                 loading={loading}
+                selectedIds={[]}
                 renderRow={(member) => (
                     <tr key={member.id} className="hover:bg-slate-50/80 transition-colors group">
                         <td className="px-4 py-4 text-center">
