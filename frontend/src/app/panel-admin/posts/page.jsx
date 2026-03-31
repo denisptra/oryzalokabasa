@@ -400,7 +400,7 @@ export default function PostsPage() {
                             </div>
                         </td>
                         <td className="px-4 py-4 text-sm text-slate-500 font-medium whitespace-nowrap">
-                            {post.createdAt ? new Date(post.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "20y" }) : "-"}
+                            {post.createdAt ? new Date(post.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "-"}
                         </td>
                         <td className="px-4 py-4 text-right">
                             <div className="flex items-center justify-end gap-1">

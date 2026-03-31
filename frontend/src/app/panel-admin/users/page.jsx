@@ -265,7 +265,7 @@ export default function UsersPage() {
                             </span>
                         </td>
                         <td className="px-4 py-4 text-sm text-slate-500 font-medium whitespace-nowrap">
-                            {u.createdAt ? new Date(u.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "2y" }) : "-"}
+                            {u.createdAt ? new Date(u.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "-"}
                         </td>
                         <td className="px-4 py-4 text-right">
                             <div className="flex items-center justify-end gap-1">
