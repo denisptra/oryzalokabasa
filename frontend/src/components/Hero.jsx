@@ -22,7 +22,7 @@ const FALLBACK_SLIDES = [
         title: "Merawat Bahasa, Menguatkan Identitas ",
         highlight: "Generasi Muda",
         subtitle: "Kami menghadirkan ruang belajar dan kolaborasi kreatif untuk membangun kesadaran budaya di era digital.",
-        imageUrl: "/Hero-2.jpg",
+        imageUrl: "/Hero-3.jpg",
     }
 ];
 
