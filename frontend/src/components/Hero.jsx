@@ -65,15 +65,15 @@ export default function HeroSlider() {
                     key={idx}
                     src={s.imageUrl || s.image ? getImageUrl(s.imageUrl || s.image) : "/Hero-1.jpg"}
                     alt={s.title || "Hero Slide"}
-                    className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ${current === idx ? "opacity-100" : "opacity-0"
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${current === idx ? "opacity-100" : "opacity-0"
                         }`}
-                    style={{ objectFit: "cover", objectPosition: "center" }}
+                    style={{ objectFit: "cover", objectPosition: "top center" }}
                     onError={(e) => { e.target.onerror = null; e.target.src = "/Hero-1.jpg"; }}
                 />
             ))}
 
-            {/* Overlay Gelap - dikurangi opacity nya dari 70% ke 40% */}
-            <div className="absolute inset-0 bg-black/40 z-10" />
+            {/* Overlay Gelap */}
+            <div className="absolute inset-0 bg-black/50 z-10" />
 
             {/* Konten Text */}
             <div className="relative z-20 max-w-4xl px-4">

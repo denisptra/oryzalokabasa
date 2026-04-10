@@ -81,7 +81,7 @@ export const Footer = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <Mail size={16} className="text-yellow-500 shrink-0" />
-                  <span>info@oryzalokabasa.com</span>
+                  <span>komunitas.o.112@gmail.com</span>
                 </div>
                 
                 {/* ALAMAT: Dibuat sejajar ikonnya dan teksnya dirapikan */}
