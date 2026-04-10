@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Inter, Playfair_Display } from "next/font/google";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -30,6 +30,8 @@ export default function HeroSlider() {
     const { t } = useLanguage();
     const [slides, setSlides] = useState(FALLBACK_SLIDES);
     const [current, setCurrent] = useState(0);
+    const [scrollProgress, setScrollProgress] = useState(0);
+    const sectionRef = useRef(null);
 
     // Fetch API
     useEffect(() => {
@@ -49,6 +51,21 @@ export default function HeroSlider() {
         return () => clearInterval(timer);
     }, [slides.length]);
 
+    // Scroll listener untuk efek warna emas pada judul
+    useEffect(() => {
+        const handleScroll = () => {
+            if (!sectionRef.current) return;
+            const rect = sectionRef.current.getBoundingClientRect();
+            const sectionHeight = rect.height;
+            // Progress dari 0 ke 1 saat user scroll melewati hero
+            const progress = Math.min(Math.max(-rect.top / (sectionHeight * 0.6), 0), 1);
+            setScrollProgress(progress);
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
     // Logika Next & Prev dijadikan 1 fungsi
     const changeSlide = (step) => {
         setCurrent(prev => (prev + step + slides.length) % slides.length);
@@ -56,8 +73,11 @@ export default function HeroSlider() {
 
     const slide = slides[current] || {};
 
+    // Interpolasi warna dari putih (#FFFFFF) ke emas (#EBA100)
+    const titleColor = `rgb(${Math.round(255 - (255 - 235) * scrollProgress)}, ${Math.round(255 - (255 - 161) * scrollProgress)}, ${Math.round(255 - (255 - 0) * scrollProgress)})`;
+
     return (
-        <section className="relative h-[90vh] flex items-center justify-center text-center px-6 overflow-hidden bg-black">
+        <section ref={sectionRef} className="relative h-[90vh] flex items-center justify-center text-center px-6 overflow-hidden bg-black">
 
             {slides.map((s, idx) => (
                 <img
@@ -70,12 +90,15 @@ export default function HeroSlider() {
                 />
             ))}
 
-            {/* Overlay Gelap */}
-            <div className="absolute inset-0 bg-black/70 z-10" />
+            {/* Overlay Gelap - dikurangi opacity nya dari 70% ke 40% */}
+            <div className="absolute inset-0 bg-black/40 z-10" />
 
             {/* Konten Text */}
             <div className="relative z-20 max-w-4xl px-4">
-                <h1 className={`text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 ${playfair.className} leading-tight`}>
+                <h1
+                    className={`text-3xl md:text-5xl lg:text-6xl font-bold mb-4 ${playfair.className} leading-tight transition-colors duration-300`}
+                    style={{ color: titleColor }}
+                >
                     {slide.title} <span className="text-oryza-gold">{slide.highlight}</span>
                 </h1>
 
