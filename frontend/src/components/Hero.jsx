@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Inter, Playfair_Display } from "next/font/google";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -30,8 +30,7 @@ export default function HeroSlider() {
     const { t } = useLanguage();
     const [slides, setSlides] = useState(FALLBACK_SLIDES);
     const [current, setCurrent] = useState(0);
-    const [scrollProgress, setScrollProgress] = useState(0);
-    const sectionRef = useRef(null);
+
 
     // Fetch API
     useEffect(() => {
@@ -51,21 +50,6 @@ export default function HeroSlider() {
         return () => clearInterval(timer);
     }, [slides.length]);
 
-    // Scroll listener untuk efek warna emas pada judul
-    useEffect(() => {
-        const handleScroll = () => {
-            if (!sectionRef.current) return;
-            const rect = sectionRef.current.getBoundingClientRect();
-            const sectionHeight = rect.height;
-            // Progress dari 0 ke 1 saat user scroll melewati hero
-            const progress = Math.min(Math.max(-rect.top / (sectionHeight * 0.6), 0), 1);
-            setScrollProgress(progress);
-        };
-
-        window.addEventListener("scroll", handleScroll, { passive: true });
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
-
     // Logika Next & Prev dijadikan 1 fungsi
     const changeSlide = (step) => {
         setCurrent(prev => (prev + step + slides.length) % slides.length);
@@ -73,19 +57,17 @@ export default function HeroSlider() {
 
     const slide = slides[current] || {};
 
-    // Interpolasi warna dari putih (#FFFFFF) ke emas (#EBA100)
-    const titleColor = `rgb(${Math.round(255 - (255 - 235) * scrollProgress)}, ${Math.round(255 - (255 - 161) * scrollProgress)}, ${Math.round(255 - (255 - 0) * scrollProgress)})`;
-
     return (
-        <section ref={sectionRef} className="relative h-[90vh] flex items-center justify-center text-center px-6 overflow-hidden bg-black">
+        <section className="relative h-[90vh] flex items-center justify-center text-center px-6 overflow-hidden bg-black">
 
             {slides.map((s, idx) => (
                 <img
                     key={idx}
                     src={s.imageUrl || s.image ? getImageUrl(s.imageUrl || s.image) : "/Hero-1.jpg"}
                     alt={s.title || "Hero Slide"}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${current === idx ? "opacity-100" : "opacity-0"
+                    className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ${current === idx ? "opacity-100" : "opacity-0"
                         }`}
+                    style={{ objectFit: "cover", objectPosition: "center" }}
                     onError={(e) => { e.target.onerror = null; e.target.src = "/Hero-1.jpg"; }}
                 />
             ))}
@@ -96,10 +78,11 @@ export default function HeroSlider() {
             {/* Konten Text */}
             <div className="relative z-20 max-w-4xl px-4">
                 <h1
-                    className={`text-3xl md:text-5xl lg:text-6xl font-bold mb-4 ${playfair.className} leading-tight transition-colors duration-300`}
-                    style={{ color: titleColor }}
+                    className={`text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 ${playfair.className} leading-tight`}
                 >
-                    {slide.title} <span className="text-oryza-gold">{slide.highlight}</span>
+                    {slide.title}
+                    <br />
+                    <span className="text-oryza-gold">{slide.highlight}</span>
                 </h1>
 
                 <p className={`${inter.className} text-gray-200 text-sm md:text-base lg:text-lg mb-8 max-w-2xl mx-auto px-2`}>
