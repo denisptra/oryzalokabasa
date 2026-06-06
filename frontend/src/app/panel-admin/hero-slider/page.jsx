@@ -397,7 +397,8 @@ export default function HeroSliderDashboardPage() {
 
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-1.5">Judul</label>
-                                <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-sm transition-all" placeholder="Judul slider" />
+                                <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-sm transition-all" placeholder="Contoh: Menghidupkan Warisan|Panggung Dunia" />
+                                <p className="text-xs text-slate-400 mt-1.5">💡 Gunakan tanda <strong className="text-amber-500">|</strong> untuk memisahkan teks putih (atas) dan <strong className="text-amber-500">emas</strong> (bawah). Contoh: <em>Judul Putih|Judul Emas</em></p>
                             </div>
 
                             <div>

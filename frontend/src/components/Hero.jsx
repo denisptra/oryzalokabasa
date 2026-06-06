@@ -11,20 +11,42 @@ const inter = Inter({ subsets: ["latin"] });
 const playfair = Playfair_Display({ subsets: ["latin"] });
 
 // Aktifkan fallback ini. Jika API gagal/kosong, web tidak akan nge-blank.
+// Format judul: gunakan "|" untuk memisahkan teks putih (atas) dan emas (bawah)
+// Contoh: "Menghidupkan Warisan Nusantara di|Panggung Dunia"
 const FALLBACK_SLIDES = [
     {
-        title: "Menghidupkan Warisan Nusantara di ",
-        highlight: "Panggung Dunia",
+        title: "Menghidupkan Warisan Nusantara di|Panggung Dunia",
         subtitle: "Komunitas seni dan budaya yang mengolah bahasa, sastra, dan seni pertunjukan sebagai ruang dialog antar tradisi dan zaman.",
         imageUrl: "/Hero-1.jpg",
     },
     {
-        title: "Merawat Bahasa, Menguatkan Identitas ",
-        highlight: "Generasi Muda",
+        title: "Merawat Bahasa, Menguatkan Identitas|Generasi Muda",
         subtitle: "Kami menghadirkan ruang belajar dan kolaborasi kreatif untuk membangun kesadaran budaya di era digital.",
         imageUrl: "/Hero-3.jpg",
     }
 ];
+
+// Helper: Split judul menjadi bagian putih (atas) dan emas (bawah)
+// Jika ada "|" → sebelum "|" = putih, setelah "|" = emas
+// Jika ada highlight field (legacy) → title = putih, highlight = emas
+// Jika tidak ada keduanya → semua putih
+function splitTitle(slide) {
+    // Legacy support: jika ada field highlight terpisah
+    if (slide.highlight) {
+        return { white: slide.title || "", gold: slide.highlight };
+    }
+    // Cek delimiter "|" di title
+    const title = slide.title || "";
+    if (title.includes("|")) {
+        const idx = title.indexOf("|");
+        return {
+            white: title.substring(0, idx).trim(),
+            gold: title.substring(idx + 1).trim(),
+        };
+    }
+    // Tidak ada delimiter → semua putih
+    return { white: title, gold: "" };
+}
 
 export default function HeroSlider() {
     const { t } = useLanguage();
@@ -56,6 +78,7 @@ export default function HeroSlider() {
     };
 
     const slide = slides[current] || {};
+    const { white: titleWhite, gold: titleGold } = splitTitle(slide);
 
     return (
         <section className="relative h-[90vh] flex items-center justify-center text-center px-6 overflow-hidden bg-black">
@@ -80,9 +103,13 @@ export default function HeroSlider() {
                 <h1
                     className={`text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 ${playfair.className} leading-tight`}
                 >
-                    {slide.title}
-                    <br />
-                    <span className="text-oryza-gold">{slide.highlight}</span>
+                    {titleWhite}
+                    {titleGold && (
+                        <>
+                            <br />
+                            <span className="text-oryza-gold">{titleGold}</span>
+                        </>
+                    )}
                 </h1>
 
                 <p className={`${inter.className} text-gray-200 text-sm md:text-base lg:text-lg mb-8 max-w-2xl mx-auto px-2`}>
