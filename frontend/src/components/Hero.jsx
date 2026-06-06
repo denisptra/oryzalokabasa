@@ -98,31 +98,6 @@ export default function HeroSlider() {
             {/* Overlay Gelap */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 z-10" />
 
-            {/* Golden Break di Bawah */}
-            <div className="absolute bottom-0 left-0 right-0 z-[15] pointer-events-none">
-                {/* SVG Wave Shape */}
-                <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-[60px] md:h-[80px] lg:h-[120px]" preserveAspectRatio="none">
-                    <path d="M0,40 C360,100 720,0 1080,60 C1260,80 1380,40 1440,50 L1440,120 L0,120 Z" fill="url(#goldGradient)" />
-                    <path d="M0,60 C320,20 640,100 960,40 C1200,0 1360,60 1440,30 L1440,120 L0,120 Z" fill="url(#goldGradient2)" opacity="0.5" />
-                    <defs>
-                        <linearGradient id="goldGradient" x1="0" y1="0" x2="1440" y2="0">
-                            <stop offset="0%" stopColor="#B8860B" />
-                            <stop offset="25%" stopColor="#DAA520" />
-                            <stop offset="50%" stopColor="#FFD700" />
-                            <stop offset="75%" stopColor="#DAA520" />
-                            <stop offset="100%" stopColor="#B8860B" />
-                        </linearGradient>
-                        <linearGradient id="goldGradient2" x1="0" y1="0" x2="1440" y2="0">
-                            <stop offset="0%" stopColor="#DAA520" />
-                            <stop offset="50%" stopColor="#FFFACD" />
-                            <stop offset="100%" stopColor="#DAA520" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-                {/* Solid gold strip to connect cleanly to white content */}
-                <div className="h-[6px] bg-gradient-to-r from-[#B8860B] via-[#FFD700] to-[#B8860B]" />
-            </div>
-
             {/* Konten Text */}
             <div className="relative z-20 max-w-4xl px-4">
                 <h1
@@ -132,7 +107,9 @@ export default function HeroSlider() {
                     {titleGold && (
                         <>
                             <br />
-                            <span className="text-oryza-gold">{titleGold}</span>
+                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#B8860B] via-[#FFD700] to-[#B8860B]">
+                                {titleGold}
+                            </span>
                         </>
                     )}
                 </h1>
