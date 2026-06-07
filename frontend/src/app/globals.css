@@ -4,6 +4,10 @@
 @theme {
     --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
     --font-serif: var(--font-playfair-display), ui-serif, Georgia, serif;
+
+    --color-oryza-gold: #EBA100;
+    --color-oryza-navy: #1A1B4B;
+    --color-oryza-text: #565656;
 }
 
 @plugin "@tailwindcss/typography";

@@ -84,7 +84,7 @@ const TeamSection = ({ t, teamData }) => {
     <section className="py-24 px-6 max-w-7xl mx-auto text-center">
       <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={slowFadeUp}>
         <span className="text-yellow-600 font-bold uppercase text-[10px] tracking-[0.4em] mb-4 block opacity-70">
-          Our Visionaries
+         Para Visioner Kami
         </span>
         <h2 className={`${playfair.className} text-4xl md:text-5xl font-bold text-blue-950 mb-6 tracking-tight`}>
           {t("about.founders_title")}
